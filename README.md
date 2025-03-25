@@ -1,6 +1,6 @@
 # Python Small Projects
 
-This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle and Pygame.
+This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
 
 ## Projects Overview
 
@@ -14,7 +14,7 @@ This repository contains a collection of small Python projects, each designed to
 
 ### 3. **Pong Arcade Game**
    - **Description**: A recreation of the classic Pong game using Python and Pygame. The project involves handling user input for paddles and implementing the game mechanics for ball movement and scoring.
-   - **Skills Learned**: Pygame, game development, collision detection.
+   - **Skills Learned**: Turtle, game development, collision detection.
 
 ### 4. **Quiz Game**
    - **Description**: A simple text-based quiz game where users answer multiple-choice questions. The project includes user interaction, input validation, and scoring.
