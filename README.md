@@ -3,11 +3,8 @@
 This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
 
 ## Projects Overview
-# Python Small Projects
 
 This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
-
-## Projects Overview
 
 ### 1. **Coffee Machine OOP**
    - **Description**: A simple coffee machine built using object-oriented programming (OOP) principles. This project simulates a coffee machine that can make various types of coffee, handle user input, and track resources like water, coffee beans, and milk.
