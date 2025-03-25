@@ -3,6 +3,11 @@
 This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
 
 ## Projects Overview
+# Python Small Projects
+
+This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
+
+## Projects Overview
 
 ### 1. **Coffee Machine OOP**
    - **Description**: A simple coffee machine built using object-oriented programming (OOP) principles. This project simulates a coffee machine that can make various types of coffee, handle user input, and track resources like water, coffee beans, and milk.
@@ -20,13 +25,23 @@ This repository contains a collection of small Python projects, each designed to
    - **Description**: A simple text-based quiz game where users answer multiple-choice questions. The project includes user interaction, input validation, and scoring.
    - **Skills Learned**: User input handling, loops, conditionals.
 
-### 5. **Snake Game**
-   - **Description**: A classic Snake game built using Python and  Turtle. The player controls a snake, eating food to grow longer while avoiding collisions with walls or itself.
+### 5. **Rock, Paper, Scissors Game**
+   - **Description**: This is a simple implementation of the classic **Rock, Paper, Scissors** game. The user plays against the computer, which randomly selects one of the three options                         (rock, paper, or scissors). The game determines the winner based on the traditional rules:
+     - **Rock** beats **Scissors**.
+     - **Scissors** beats **Paper**.
+     - **Paper** beats **Rock**.
+   - **Skills Learned**: Randomization, conditionals, user input handling.
+
+### 6. **Snake Game**
+   - **Description**: A classic Snake game built using Python and Turtle. The player controls a snake, eating food to grow longer while avoiding collisions with walls or itself.
    - **Skills Learned**: Game development, collision detection, loops.
+
 
 ## Requirements
 
-To run these projects, you will need Python installed on your machine. Some projects may also require the installation of external libraries such as Pygame and Turtle. You can install these libraries using pip:
+To run these projects, you will need Python installed on your machine. Some projects may also require the installation of external libraries. You can install these libraries using pip:
 
 ```sh
-pip install pygame
+pip install
+
+
