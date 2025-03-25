@@ -13,7 +13,7 @@ This repository contains a collection of small Python projects, each designed to
    - **Skills Learned**: Turtle graphics, randomization, graphical programming.
 
 ### 3. **Pong Arcade Game**
-   - **Description**: A recreation of the classic Pong game using Python and Pygame. The project involves handling user input for paddles and implementing the game mechanics for ball movement and scoring.
+   - **Description**: A recreation of the classic Pong game using Python and Turtle. The project involves handling user input for paddles and implementing the game mechanics for ball movement and scoring.
    - **Skills Learned**: Turtle, game development, collision detection.
 
 ### 4. **Quiz Game**
@@ -21,8 +21,8 @@ This repository contains a collection of small Python projects, each designed to
    - **Skills Learned**: User input handling, loops, conditionals.
 
 ### 5. **Snake Game**
-   - **Description**: A classic Snake game built using Python and Pygame. The player controls a snake, eating food to grow longer while avoiding collisions with walls or itself.
-   - **Skills Learned**: Game development, Pygame, collision detection, loops.
+   - **Description**: A classic Snake game built using Python and  Turtle. The player controls a snake, eating food to grow longer while avoiding collisions with walls or itself.
+   - **Skills Learned**: Game development, collision detection, loops.
 
 ## Requirements
 
