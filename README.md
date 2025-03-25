@@ -1,13 +1,12 @@
 # Python Small Projects
 
-This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
-
 ## Projects Overview
 
 This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
 
 ### 1. **Coffee Machine OOP**
-   - **Description**: A simple coffee machine built using object-oriented programming (OOP) principles. This project simulates a coffee machine that can make various types of coffee, handle user input, and track resources like water, coffee beans, and milk.
+   - **Description**: A simple coffee machine built using object-oriented programming (OOP) principles. This project simulates a coffee machine that can make various types of coffee, 
+                      handle user input, and track resources like water, coffee beans, and milk. It calculates the money received and give change if necessary, afterwards is ready to                            serve the coffee.
    - **Skills Learned**: OOP, class and object management, input handling.
 
 ### 2. **Paint Hacking (Using Turtle)**
@@ -15,7 +14,7 @@ This repository contains a collection of small Python projects, each designed to
    - **Skills Learned**: Turtle graphics, randomization, graphical programming.
 
 ### 3. **Pong Arcade Game**
-   - **Description**: A recreation of the classic Pong game using Python and Turtle. The project involves handling user input for paddles and implementing the game mechanics for ball movement and scoring.
+   - **Description**: A recreation of the classic Pong game using Python and Turtle. The project  implements the game mechanics for ball movement and scoring.
    - **Skills Learned**: Turtle, game development, collision detection.
 
 ### 4. **Quiz Game**
@@ -23,10 +22,7 @@ This repository contains a collection of small Python projects, each designed to
    - **Skills Learned**: User input handling, loops, conditionals.
 
 ### 5. **Rock, Paper, Scissors Game**
-   - **Description**: This is a simple implementation of the classic **Rock, Paper, Scissors** game. The user plays against the computer, which randomly selects one of the three options                         (rock, paper, or scissors). The game determines the winner based on the traditional rules:
-     - **Rock** beats **Scissors**.
-     - **Scissors** beats **Paper**.
-     - **Paper** beats **Rock**.
+   - **Description**: This is a simple implementation of the classic **Rock, Paper, Scissors** game. The user plays against the computer, which randomly selects one of the three options                         (rock, paper, or scissors). The game determines the winner based on the traditional rules.
    - **Skills Learned**: Randomization, conditionals, user input handling.
 
 ### 6. **Snake Game**
