@@ -10,8 +10,8 @@ This repository contains a collection of small Python projects, each designed to
    - **Description**: A simple coffee machine built using object-oriented programming (OOP) principles. This project simulates a coffee machine that can make various types of coffee, handle user input, and track resources like water, coffee beans, and milk.
    - **Skills Learned**: OOP, class and object management, input handling.
 
-### 2. **Pain Hacking (Using Turtle)**
-   - **Description**: A fun project where random dots are drawn across the screen using Python's Turtle graphics library. The placement of these dots is random, creating a chaotic pattern.
+### 2. **Paint Hacking (Using Turtle)**
+   - **Description**: A fun project where random dots are drawn across the screen using Python's Turtle graphics library. The placement of these dots is random, creating a pattern.
    - **Skills Learned**: Turtle graphics, randomization, graphical programming.
 
 ### 3. **Pong Arcade Game**
