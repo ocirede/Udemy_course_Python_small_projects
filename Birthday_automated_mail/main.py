@@ -8,7 +8,7 @@ with open("Input/Names/invited_names.txt") as names:
 for name in list_of_names:
     new_name = name.strip()
     personalized_mail = mail_template.replace("[name]", new_name)
-    with open(f"./Output/letter_for_{new_name}.txt", mode="w") as saving_mails:
+    with open(f"./Output/ReadyToSend/letter_for_{new_name}.docx", mode="w") as saving_mails:
         saving_mails.write(personalized_mail)
 
 
