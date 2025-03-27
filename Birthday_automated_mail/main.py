@@ -1,8 +1,8 @@
 
-with open("./Input/Letters/starting_letter.txt") as mail:
+with open("Input/Letters/starting_letter.txt") as mail:
     mail_template = mail.read()
 
-with open("./Input/Names/invited_names.txt") as names:
+with open("Input/Names/invited_names.txt") as names:
     list_of_names = names.readlines()
 
 for name in list_of_names:
