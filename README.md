@@ -36,6 +36,9 @@ This repository contains a collection of small Python projects, each designed to
    - **Description**: A simple game using Python's Turtle library, where the player controls a turtle that must cross a road filled with cars. The game involves collision detection, user input, and basic game mechanics.
    - **Skills Learned**: Game development, event handling, collision detection, and Turtle graphics.
 
+### 9. **US States Game**
+ - **Description**: A geography-based game where the player guesses US state names, which are then displayed on a map using Python's Turtle graphics. The game continues until all 50 states are guessed. 
+ - **Skills Learned**: File handling with Pandas, user input handling, Turtle graphics, and event-driven programming.
 ## Requirements
 
 To run these projects, you will need Python installed on your machine. Some projects may also require the installation of external libraries. You can install these libraries using pip:
