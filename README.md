@@ -2,7 +2,7 @@
 
 ### **Projects Overview**
 
-This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle.
+This repository contains a collection of small Python projects, each designed to help me practice and learn different aspects of Python programming. The projects include a mix of object-oriented programming (OOP), game development, and graphical applications using libraries like Turtle, Tkinter or Pandas.
 
 ### **1. Birthday Automated Mail**
 - **Description**: This project automates the process of sending personalized birthday invitation emails. It reads a starting template letter from a file and a list of names from another file, replacing the placeholder `[name]` with the actual recipient's name. The personalized emails are then saved to individual files for each recipient.
