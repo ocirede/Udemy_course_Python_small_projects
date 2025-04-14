@@ -20,37 +20,37 @@ This repository contains a collection of small Python projects, each designed to
 - **Description**: A fun project where random dots are drawn across the screen using Python's Turtle graphics library. The placement of these dots is random, creating a pattern.
 - **Skills Learned**: Turtle graphics, randomization, graphical programming.
 
-### **5. Password Manager Project with Tkinter**
-- **Description**: A graphical password manager that generates secure random passwords and allows users to store them. The app uses `Tkinter` for the GUI and includes a password generator with letters, numbers, and symbols, and a copy-to-clipboard feature. It also allows users to store website, email/username, and password combinations.
-- **Skills Learned**: Tkinter GUI design, randomization, event-driven programming, text field manipulation, clipboard handling, basic data storage.
-
-### **6. Pomodoro Timer**
+### **5. Pomodoro Timer**
 - **Description**: A timer application based on the Pomodoro Technique, which helps users focus by alternating periods of work and rest. The app includes a countdown mechanism for work sessions, short breaks, and long breaks, along with a visual checkmark tracker for completed work sessions.
 - **Skills Learned**: Time-based automation, UI updates with Tkinter, loops, conditional logic, and applying productivity techniques in code.
 
-### **7. Pong Arcade Game**
+### **6. Pong Arcade Game**
 - **Description**: A recreation of the classic Pong game using Python and Turtle. The project implements the game mechanics for ball movement and scoring.
 - **Skills Learned**: Turtle, game development, collision detection.
 
-### **8. Quiz Game**
+### **7. Quiz Game**
 - **Description**: A simple text-based quiz game where users answer multiple-choice questions. The project includes user interaction, input validation, and scoring.
 - **Skills Learned**: User input handling, loops, conditionals.
 
-### **9. Rock, Paper, Scissors Game**
+### **8. Rock, Paper, Scissors Game**
 - **Description**: This is a simple implementation of the classic **Rock, Paper, Scissors** game. The user plays against the computer, which randomly selects one of the three options (rock, paper, or scissors). The game determines the winner based on the traditional rules.
 - **Skills Learned**: Randomization, conditionals, user input handling.
 
-### **10. Snake Game**
+### **9. Snake Game**
 - **Description**: A classic Snake game built using Python and Turtle. The player controls a snake, eating food to grow longer while avoiding collisions with walls or itself.
 - **Skills Learned**: Game development, collision detection, loops.
 
-### **11. Turtle Crossing Road Game**
+### **10. Turtle Crossing Road Game**
 - **Description**: A simple game using Python's Turtle library, where the player controls a turtle that must cross a road filled with cars. The game involves collision detection, user input, and basic game mechanics.
 - **Skills Learned**: Game development, event handling, collision detection, and Turtle graphics.
 
-### **12. US States Game**
+### **11. US States Game**
 - **Description**: A geography-based game where the player guesses US state names, which are then displayed on a map using Python's Turtle graphics. The game continues until all 50 states are guessed.
 - **Skills Learned**: File handling with Pandas, user input handling, Turtle graphics, and event-driven programming.
+
+### **12. Password Manager Project**
+- **Description**: A graphical password manager that generates secure random passwords and allows users to store them. The app uses `Tkinter` for the GUI and includes a password generator with letters, numbers, and symbols, and a copy-to-clipboard feature. It also allows users to store website, email/username, and password combinations.
+- **Skills Learned**: Tkinter GUI design, randomization, event-driven programming, text field manipulation, clipboard handling, basic data storage.
 
 ### **Requirements**
 
