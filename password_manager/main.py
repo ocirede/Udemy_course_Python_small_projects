@@ -24,27 +24,24 @@ def find_file(filename, search_path):
 
 def find_password():
     file = find_file("password_manager.json", "/")
-    print(f"File found: {file}")
     website = web_input.get().strip()
-    print(f"Website input: {website}")
     if not file:
         messagebox.showwarning("No file", "No data file has been loaded or saved yet")
         return
     try:
         with open(file, "r") as data_file:
-            print(file)
             data = json.load(data_file)
-            print(f"Loaded data: {data}")
     except FileNotFoundError:
         messagebox.showerror("File not found", "Could not find the data file.")
         return
-
-    if website in data:
-        password = data[website]["password"]
-        messagebox.showinfo(message=f"Website: {website}\nPassword: {password}")
-        web_input.delete(0, END)
     else:
-        messagebox.showwarning("Website not found", "No data found for the website entered.")
+        if website in data:
+            email = data[website]["email"]
+            password = data[website]["password"]
+            messagebox.showinfo(title=website,  message=f"Email: {email}\nPassword: {password}")
+            web_input.delete(0, END)
+        else:
+            messagebox.showwarning("Website not found", "No data found for the website entered.")
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
@@ -131,7 +128,7 @@ password_label.grid(column=0, row=3, sticky='e',  padx=5, pady=5)
 
 #website entry
 
-web_input = Entry()
+web_input = Entry(width=21)
 web_input.grid(column=1, row=1, sticky='w')
 web_input.focus()
 
