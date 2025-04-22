@@ -62,4 +62,5 @@ This repository contains a collection of small Python projects, each designed to
 
 ## **Requirements**  
 ```sh
-pip install pandas tkinter turtle
+pip install -r requirements.txt
+```
