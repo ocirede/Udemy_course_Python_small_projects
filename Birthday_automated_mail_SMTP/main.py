@@ -23,6 +23,9 @@ filenames = os.listdir(folder_path)
 random_filename = random.choice(filenames)
 file_path = os.path.join(folder_path, random_filename)
 
+#--------------ENVIRONMENT VARIABLES---------------#
+MY_EMAIL = os.getenv("EMAIL")
+PASSWORD = os.getenv("PASSWORD")
 #--------------MAIN FUNCTIONALITY---------------#
 for person in dic_birthdays:
     if person["month"] == month and person["day"] == day:
