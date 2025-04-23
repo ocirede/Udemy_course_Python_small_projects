@@ -5,8 +5,7 @@ import pandas as pd
 import os
 
 #--------------CONSTANTS---------------#
-MY_EMAIL = "federico.diaferia@gmail.com"
-PASSWORD = "aqszbuqjvhdnamxs"
+
 TITLE_MAIL = "Happy Birthday"
 
 #--------------DATETIME---------------#
