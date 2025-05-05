@@ -18,6 +18,8 @@ auth_token = os.getenv("AUTH_TOKEN")
 api_stock = os.getenv("API_STOCK")
 api_news = os.getenv("API_NEWS")
 phone_number = os.getenv("PHONE_NUMBER")
+virtual_phone = os.getenv("VIRTUAL_PHONE")
+
 #------------DATETIME FUNCTIONS-----------#
 yesterday = dt.datetime.now().date() - dt.timedelta(days=1)
 today = dt.datetime.now().date()
@@ -63,7 +65,7 @@ if percentage_change > 5:
     client = Client(account_sid, auth_token)
     try:
         message = client.messages.create(
-            from_="+13159731146",
+            from_=virtual_phone,
             body= message_body,
             to= phone_number
         )
