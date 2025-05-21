@@ -60,11 +60,15 @@ This repository contains a collection of small Python projects, each designed to
   - Data persistence (CSV or JSON)  
 - **Skills Learned**: Tkinter GUI, event binding, file I/O, dictionary manipulation  
 
-### **14. Password Manager Project**  
+### **14. Flight Search with Amadeus and Twilio API**  
+- **Description**: This project integrates the Amadeus API to search for flights based on origin, destination, and price. The system automatically manages access tokens, searches for flight offers, and parses the results to extract flight segments and pricing information. Once a flight match is found, the application formats the flight details and sends them as a text message via the Twilio SMS API.  
+- **Skills Learned**: REST API integration (Amadeus), access token management, JSON parsing, working with datetime and IATA codes, automated messaging with Twilio, environment variable handling.
+
+### **15. Password Manager Project**  
 - **Description**: Tkinter GUI for generating/storing passwords with clipboard support.  
 - **Skills Learned**: Tkinter widgets, encryption basics, clipboard integration.  
 
-### **15. Stock News Notifier**  
+### **16. Stock News Notifier**  
 - **Description**: This project fetches the latest stock data for Bitcoin and analyzes its price change from the previous day. If the price change exceeds 5%, the script fetches relevant news articles and sends them as a text message (via Twilio) to a specified phone number. The message includes a summary of the price change and a headline from the latest news related to Bitcoin.  
 - **Skills Learned**: API interaction (Alphavantage, NewsAPI), data manipulation, Twilio integration for SMS, working with environment variables.  
 
