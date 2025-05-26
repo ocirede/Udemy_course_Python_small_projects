@@ -8,6 +8,19 @@ fd = FlightData()
 nm = NotificationManager()
 sheet_data = dm.get_sheet_data()
 
+
+def process_flights(flights):
+    if flights["data"]:
+        sorted_flights = sorted(flights["data"], key=lambda f: float(f["price"]["grandTotal"]))
+        first_flight = sorted_flights[0]
+        itineraries = first_flight["itineraries"]
+        price = first_flight["price"]
+        flight_infos = fd.structured_data(itineraries, price)
+        notification = nm.send_message(flight_infos)
+        return notification
+    return None
+
+
 def main():
     for row in sheet_data["prices"]:
         if row["iataCode"] == "" or row["iataCode"] == "TESTING":
@@ -17,14 +30,10 @@ def main():
         iata_code = row["iataCode"]
         lowest_price = int(row["lowestPrice"])
         flights = fs.search_flights(iata_code, lowest_price)
-        if flights["data"]:
-            sorted_flights = sorted(flights["data"], key=lambda f: float(f["price"]["grandTotal"]))
-            first_flight = sorted_flights[0]
-            itineraries = first_flight["itineraries"]
-            price = first_flight["price"]
-            flight_infos =fd.structured_data(itineraries, price)
-            notification = nm.send_message(flight_infos)
+        if not flights["data"]:
+            flights = fs.search_flights(iata_code, lowest_price, is_direct=False)
 
+        process_flights(flights)
 
 
 if __name__ == "__main__":
