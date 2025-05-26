@@ -1,5 +1,6 @@
 import requests
 from token_update import AmadeusToken
+from datetime import datetime, timedelta
 
 
 class FlightSearch:
@@ -25,19 +26,33 @@ class FlightSearch:
                     print(f"Error fetching IATA code for {city_name}: {e}")
             return "TESTING"
 
-    def search_flights(self, iata_code, lowest_price):
-        params = {
-            "originLocationCode": "BER",
-            "destinationLocationCode": iata_code,
-            "departureDate": "2026-02-01",
-            "adults": 1,
-            "maxPrice": lowest_price,
-            "currencyCode": "EUR"
-        }
-        response = requests.get(url=self.flight_search, params=params, headers=self.headers)
-        print(response.status_code)
-        data = response.json()
-        return data
+    def search_flights(self, iata_code, lowest_price, days_back=3):
+        base_departure_date = datetime.strptime("2026-01-31", "%Y-%m-%d")
+        base_return_date = datetime.strptime("2026-02-21", "%Y-%m-%d")
+        trip_length = (base_return_date - base_departure_date).days
+
+        for i in range(days_back + 1):
+            departure_date = base_departure_date - timedelta(days=i)
+            return_date = departure_date + timedelta(days=trip_length)
+
+            params = {
+                "originLocationCode": "BER",
+                "destinationLocationCode": iata_code,
+                "departureDate": departure_date.strftime("%Y-%m-%d"),
+                "returnDate": return_date.strftime("%Y-%m-%d"),
+                "adults": 1,
+                "maxPrice": lowest_price,
+                "currencyCode": "EUR"
+            }
+
+            print(f"Trying: {params['departureDate']} -> {params['returnDate']}")
+            response = requests.get(url=self.flight_search, params=params, headers=self.headers)
+            data = response.json()
+
+            if data.get("data"):
+                return data
+
+        return {"data": [], "message": "No results found in the given range."}
 
 
 
