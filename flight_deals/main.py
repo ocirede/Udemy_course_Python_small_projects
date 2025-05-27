@@ -2,12 +2,14 @@ from data_manager import DataManager
 from flight_search import FlightSearch
 from flight_data import  FlightData
 from notification_manager import NotificationManager
+
 dm = DataManager()
 fs = FlightSearch()
 fd = FlightData()
 nm = NotificationManager()
 sheet_data = dm.get_sheet_data()
-
+sheet_users = dm.get_sheet_users()
+users_emails = [user["whatIsYourEmail ?"] for user in sheet_users["users"]]
 
 def process_flights(flights):
     if flights["data"]:
@@ -17,7 +19,12 @@ def process_flights(flights):
         price = first_flight["price"]
         flight_infos = fd.structured_data(itineraries, price)
         notification = nm.send_message(flight_infos)
-        return notification
+        email_notifications = []
+        for email in users_emails:
+            email_notification = nm.send_emails(flight_infos, email)
+            email_notifications.append(email_notification)
+
+        return notification, email_notifications
     return None
 
 
