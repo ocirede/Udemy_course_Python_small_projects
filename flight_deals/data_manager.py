@@ -8,6 +8,7 @@ class DataManager:
         self.sheety_token = os.getenv("SHEETY_TOKEN")
         self.endpoint = "https://api.sheety.co"
         self.prices = "f489ed90d1332f35a23104bb935a9b5e/flightDeals/prices"
+        self.users = "f489ed90d1332f35a23104bb935a9b5e/flightDeals/users"
         self.headers = {
             "Authorization": f"Basic {self.sheety_token}"
         }
@@ -16,6 +17,15 @@ class DataManager:
     def get_sheet_data(self):
         try:
             response = requests.get(url=f"{self.endpoint}/{self.prices}", headers=self.headers)
+            print(response.status_code)
+            data = response.json()
+            return data
+        except Exception as e:
+            print(e)
+
+    def get_sheet_users(self):
+        try:
+            response = requests.get(url=f"{self.endpoint}/{self.users}", headers=self.headers)
             print(response.status_code)
             data = response.json()
             return data
