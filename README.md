@@ -40,19 +40,23 @@ This repository contains a collection of small Python projects, each designed to
 - **Description**: CLI implementation of the classic game against computer AI.  
 - **Skills Learned**: Randomization, game logic.  
 
-### **10. Snake Game**  
+### **10. Billboard Hot 100 Scraper**
+- **Description**: This project scrapes the Billboard Hot 100 chart for a given date, retrieves the song titles and artists, then uses the Spotify API to find the matching tracks and create a private playlist with those songs. It combines web scraping, API interaction, and playlist management.  
+- **Skills Learned**: Web scraping with BeautifulSoup, REST API usage (Spotify), authentication, data parsing, playlist creation automation.
+
+### **11. Snake Game**  
 - **Description**: Classic Snake game using Turtle graphics.  
 - **Skills Learned**: Game loops, collision detection.  
 
-### **11. Turtle Crossing Road Game**  
+### **12. Turtle Crossing Road Game**  
 - **Description**: Turtle must cross a road with moving cars (Turtle graphics).  
 - **Skills Learned**: Event handling, collision detection.  
 
-### **12. US States Game**  
+### **13. US States Game**  
 - **Description**: Geography quiz that plots guessed US states on a Turtle graphics map.  
 - **Skills Learned**: Pandas data handling, Turtle graphics.  
 
-### **13. Flash Card Game (German-English Translation)**  
+### **14. Flash Card Game (German-English Translation)**  
 - **Description**: Tkinter-based flashcard app for language learning with:  
   - German-English word pairs  
   - Flip animation with delayed translation  
@@ -60,15 +64,15 @@ This repository contains a collection of small Python projects, each designed to
   - Data persistence (CSV or JSON)  
 - **Skills Learned**: Tkinter GUI, event binding, file I/O, dictionary manipulation  
 
-### **14. Flight Search with Amadeus and Twilio API**  
+### **15. Flight Search with Amadeus and Twilio API**  
 - **Description**: This project integrates the Amadeus API to search for flights based on origin, destination, and price. The system automatically manages access tokens, searches for flight offers, and parses the results to extract flight segments and pricing information. Once a flight match is found, the application formats the flight details and sends them as a text message via the Twilio SMS API.  
 - **Skills Learned**: REST API integration (Amadeus), access token management, JSON parsing, working with datetime and IATA codes, automated messaging with Twilio, environment variable handling.
 
-### **15. Password Manager Project**  
+### **16. Password Manager Project**  
 - **Description**: Tkinter GUI for generating/storing passwords with clipboard support.  
 - **Skills Learned**: Tkinter widgets, encryption basics, clipboard integration.  
 
-### **16. Stock News Notifier**  
+### **17. Stock News Notifier**  
 - **Description**: This project fetches the latest stock data for Bitcoin and analyzes its price change from the previous day. If the price change exceeds 5%, the script fetches relevant news articles and sends them as a text message (via Twilio) to a specified phone number. The message includes a summary of the price change and a headline from the latest news related to Bitcoin.  
 - **Skills Learned**: API interaction (Alphavantage, NewsAPI), data manipulation, Twilio integration for SMS, working with environment variables.  
 
