@@ -19,7 +19,7 @@ PEOPLE = os.getenv("PEOPLE")
 DATE = os.getenv("DATE")
 APPLYING_EMAIL = os.getenv("EMAIL")
 WBS_PASSWORD = os.getenv("WBS_PASSWORD")
-INBERLINWOHNEN_URL = "https://www.inberlinwohnen.de/"
+INBERLINWOHNEN_URL = os.getenv("URL")
 
 chrome_options = webdriver.ChromeOptions()
 
