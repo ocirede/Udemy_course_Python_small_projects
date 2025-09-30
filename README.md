@@ -66,31 +66,43 @@ This repository contains a collection of small Python projects, each designed to
 
 ---
 
-### 11. Billboard Hot 100 Scraper  
+### 11. Apartment Scraper with Selenium  
+**Description**: An automated web scraper that navigates apartment listing websites using Selenium WebDriver. 
+The bot fills out search forms by interacting with various UI elements including text inputs, radio buttons, date pickers, 
+and ng-select dropdowns. It handles dynamic Angular components by typing to filter dropdown options and uses multiple click 
+strategies (JavaScript execution, ActionChains) to interact with elements. The scraper can extract apartment details and 
+automate the application process.  
+**Skills Learned**: Web automation with Selenium, handling dynamic Angular/ng-select components, element interaction 
+strategies (typing to filter dropdowns), CSS selector and XPath usage, form automation, JavaScript execution in browser 
+context, wait conditions and timing strategies.
+
+---
+
+### 12. Billboard Hot 100 Scraper  
 **Description**: This project scrapes the Billboard Hot 100 chart for a given date, retrieves the song titles and artists, then uses the Spotify API to find the matching tracks and create a private playlist with those songs. It combines web scraping, API interaction, and playlist management.  
 **Skills Learned**: Web scraping with BeautifulSoup, REST API usage (Spotify), authentication, data parsing, playlist creation automation.
 
 ---
 
-### 12. Snake Game  
+### 13. Snake Game  
 **Description**: Classic Snake game using Turtle graphics.  
 **Skills Learned**: Game loops, collision detection.
 
 ---
 
-### 13. Turtle Crossing Road Game  
+### 14. Turtle Crossing Road Game  
 **Description**: Turtle must cross a road with moving cars (Turtle graphics).  
 **Skills Learned**: Event handling, collision detection.
 
 ---
 
-### 14. US States Game  
+### 15. US States Game  
 **Description**: Geography quiz that plots guessed US states on a Turtle graphics map.  
 **Skills Learned**: Pandas data handling, Turtle graphics.
 
 ---
 
-### 15. Flash Card Game (German-English Translation)  
+### 16. Flash Card Game (German-English Translation)  
 **Description**: Tkinter-based flashcard app for language learning with:  
 - German-English word pairs  
 - Flip animation with delayed translation  
@@ -100,19 +112,19 @@ This repository contains a collection of small Python projects, each designed to
 
 ---
 
-### 16. Flight Search with Amadeus and Twilio API  
+### 17. Flight Search with Amadeus and Twilio API  
 **Description**: This project integrates the Amadeus API to search for flights based on origin, destination, and price. The system automatically manages access tokens, searches for flight offers, and parses the results to extract flight segments and pricing information. Once a flight match is found, the application formats the flight details and sends them as a text message via the Twilio SMS API.  
 **Skills Learned**: REST API integration (Amadeus), access token management, JSON parsing, working with datetime and IATA codes, automated messaging with Twilio, environment variable handling.
 
 ---
 
-### 17. Password Manager Project  
+### 18. Password Manager Project  
 **Description**: Tkinter GUI for generating/storing passwords with clipboard support.  
 **Skills Learned**: Tkinter widgets, encryption basics, clipboard integration.
 
 ---
 
-### 18. Stock News Notifier  
+### 19. Stock News Notifier  
 **Description**: This project fetches the latest stock data for Bitcoin and analyzes its price change from the previous day. If the price change exceeds 5%, the script fetches relevant news articles and sends them as a text message (via Twilio) to a specified phone number. The message includes a summary of the price change and a headline from the latest news related to Bitcoin.  
 **Skills Learned**: API interaction (Alphavantage, NewsAPI), data manipulation, Twilio integration for SMS, working with environment variables.
 
