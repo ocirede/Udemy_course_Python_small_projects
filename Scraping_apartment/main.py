@@ -19,7 +19,7 @@ PEOPLE = os.getenv("PEOPLE")
 DATE = os.getenv("DATE")
 APPLYING_EMAIL = os.getenv("EMAIL")
 WBS_PASSWORD = os.getenv("WBS_PASSWORD")
-INBERLINWOHNEN_URL = os.getenv("URL")
+URL = os.getenv("URL")
 
 chrome_options = webdriver.ChromeOptions()
 
@@ -35,7 +35,7 @@ chrome_options.add_argument(f"--user-data-dir={tmp_profile}")
 chrome_options.add_argument("--remote-debugging-port=9222")
 
 driver = webdriver.Chrome(options=chrome_options)
-driver.get("https://www.inberlinwohnen.de/")
+driver.get(URL)
 
 wait = WebDriverWait(driver, 15)
 
