@@ -8,7 +8,6 @@ import time
 import os
 from dotenv import load_dotenv
 import tempfile
-from chrome import Chrome
 
 load_dotenv()
 
@@ -39,10 +38,7 @@ driver.get(URL)
 
 wait = WebDriverWait(driver, 15)
 
-# time.sleep(2)
-# chrome = Chrome()
-# driver = chrome.driver
-# wait = chrome.wait
+
 
 def cookies_function():
     try:
