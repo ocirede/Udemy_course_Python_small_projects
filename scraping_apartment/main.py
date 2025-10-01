@@ -42,8 +42,8 @@ wait = WebDriverWait(driver, 15)
 
 def cookies_function():
     try:
-        alle_akzeptieren = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div/div[2]/div[4]/button[2]")))
-        alle_akzeptieren.click()
+        alles_akzeptieren = wait.until(EC.element_to_be_clickable((By.XPATH, "/html/body/div[2]/div/div[2]/div[4]/button[2]")))
+        alles_akzeptieren.click()
     except (NoSuchElementException, TimeoutException) as e:
         return f"{e}"
 
