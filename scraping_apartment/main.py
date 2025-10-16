@@ -59,15 +59,6 @@ login = LoginHandler(chrome.driver, chrome.wait, APPLYING_EMAIL, WBS_PASSWORD)
 portal = PortalHandler(chrome.driver, chrome.wait)
 agencies = Agencies(chrome.driver, chrome.wait, VORNAME, NACHNAME, APPLYING_EMAIL, TELEPHONE, DATE, PEOPLE)
 
-# def gesobau_function(main_window):
-#     try:
-#         jetzt_bewerben_btn = driver.find_element(By.XPATH,"/html/body/div[2]/div[2]/main/article/section[2]/section[2]/div/div/span/a")
-#         jetzt_bewerben_btn.click()
-#         if not jetzt_bewerben_btn:
-#             pass
-#
-#     except Exception as e:
-#         print("⚠️ Error submitting form:", e)
 
 if __name__ == "__main__":
     try:
