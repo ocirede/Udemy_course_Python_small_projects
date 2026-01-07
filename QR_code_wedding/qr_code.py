@@ -10,5 +10,5 @@ URL = os.getenv("URL")
 data= URL
 img = qrcode.make(data)
 
-img.save("my_qrcode.png")
+img.save("static/images/my_qrcode.png")
 
