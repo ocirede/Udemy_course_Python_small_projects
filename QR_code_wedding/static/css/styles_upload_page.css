@@ -1,0 +1,118 @@
+
+/* Base layout*/
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+
+    font-family: 'Inter', sans-serif;
+    background-image: url('https://www.transparenttextures.com/patterns/pw-maze-white.png');
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 5%;
+    left: 3%;
+    width: 600px;
+    height: 800px;
+    background-image: url('/static/images/Sirena.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: rotate(-10deg);
+    transform-origin: center;
+    z-index: 1;
+}
+
+/* Right side Sirena */
+body::after {
+    content: '';
+    position: absolute;
+    top: 14%;
+    right: 5%;
+    width: 600px;
+    height: 800px;
+    background-image: url('/static/images/Sirena.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: rotate(-10deg);
+    transform-origin: center;
+    z-index: 1;
+}
+
+.overlay {
+
+    background-color: rgba(255, 255, 255, 0.55);
+    border-radius: 10px;
+    position: relative;
+    text-align: center;
+    border: 1px solid black;
+    padding: 10px 20px;
+    width: 85%;
+    max-width: 400px;
+    height: auto;
+    padding: 20px;
+    margin: 0 auto;
+    z-index: 2;
+
+     /* Center on entire page */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+/* Tablet - 999px and below */
+@media (max-width: 1400px) {
+    body::before {
+        width: 400px;
+        height: 600px;
+        top: 3%;
+        left: 2%;
+        transform: rotate(-8deg);
+    }
+
+    body::after {
+        width: 400px;
+        height: 600px;
+        top: 35%;
+        right: 2%;
+        transform: rotate(-8deg);
+    }
+}
+
+@media (max-width: 768px) {
+    body::before{
+        width: 330px;
+        height: 530px;
+    }
+
+      body::after {
+        width: 330px;
+        height: 530px;
+        top: 45%;
+
+    }
+
+}
+
+@media (max-width: 468px) {
+    body::before {
+        width: 280px;
+        height: 380px;
+    }
+
+     body::after {
+        width: 280px;
+        height: 380px;
+    }
+
+
+}
+
+

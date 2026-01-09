@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Album di matrimonio di Angelica e Matteo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+
+        <div class="overlay">
+            <h1>Angélica e Matteo</h1>
+        <h2 id="title">Benvenuti nell'album di foto condivise</h2>
+
+        <p class="paragraphs_main_page">
+            Carica tutte le tue foto e permettici di avere ancora più ricordi di questo giorno così speciale.
+        </p>
+
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    Premi qui per scegliere le tue foto
+                </p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+
+                <label class="file-button">
+                    <span id="file-label-text"> Scegli foto</span>
+                    <input type="file" name="file" accept="image/*" multiple required id="file-input">
+                </label>
+            </div>
+
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    E poi qui per caricarle sul sito
+                </p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+                <button type="submit">Carica foto</button>
+
+
+            </div>
+
+        </form>
+
+        <div class="step">
+            <p class="paragraphs_main_page">
+                Fatto! Ora, se vuoi vedere le foto puoi premere questo link
+            </p>
+               <h3><a href="/gallery">Galleria fotografica</a></h3>
+
+        </div>
+
+        <div class="step">
+            <p class="paragraphs_main_page">
+                (Para la versión en español presiona
+            </p>
+                <h3><a href="{{url_for('index' )}}">aqui</a>)</h3>
+
+        </div>
+</div>
+    </div>
+
+<script>
+        const input = document.getElementById("file-input");
+        const labelText = document.getElementById("file-label-text");
+
+        input.addEventListener("change", function () {
+        const count = this.files.length;
+
+        if (count > 0) {
+            if (count === 1) {
+                labelText.textContent = `${count} foto selezionata`;
+            } else {
+                labelText.textContent = `${count} foto selezionate`;
+            }
+        } else {
+            labelText.textContent = "Elegir fotos";
+        }
+        });
+
+</script>
+</body>
+</html>

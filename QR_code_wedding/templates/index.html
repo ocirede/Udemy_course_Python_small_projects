@@ -2,14 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Angelica y Matteo wedding album</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
 </head>
 <body>
-<a href="/gallery">Gallery photos</a>
-<h2>Upload wedding photos 📸</h2>
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-        <input type="file" name="file" accept="image/*" multiple required>
-        <button type="submit">Upload</button>
-    </form>
+    <div class="container">
+        <div class="overlay">
+        <h1>Angélica y Matteo</h1>
+        <div class="title_overlay">
+            <h2 id="title">Bienvenidos al álbum grupal de fotos</h2>
+        </div>
+
+        <p class="paragraphs_main_page">
+            Sube todas tus fotos y permítenos tener aún más recuerdos de este día tan especial.
+        </p>
+
+        <form method="POST" action="/upload" enctype="multipart/form-data">
+
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    Presiona este botón para elegir tus fotos
+                </p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+               <label class="file-button">
+                    <span id="file-label-text">Elegir fotos</span>
+                    <input type="file" name="file" accept="image/*" multiple required id="file-input">
+                </label>
+            </div>
+
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    Y luego presiona este botón para subirlas.
+                </p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+                <button type="submit">Subir fotos</button>
+            </div>
+
+        </form>
+        <div class="step">
+            <p class="paragraphs_main_page">
+            ¡Listo!, ahora si quieres ver las fotos puedes presionar este enlace
+            </p>
+            <h3><a  href="/gallery">Galería de fotos</a></h3>
+
+        </div>
+
+
+        <div class="step">
+             <p class="paragraphs_main_page">
+                 (Per italiano clicca
+              </p>
+           <h3><a href="{{url_for('italiano')}}">qui</a>)</h3>
+
+        </div>
+        </div>
+    </div>
+
+<script>
+        const input = document.getElementById("file-input");
+        const labelText = document.getElementById("file-label-text");
+
+        input.addEventListener("change", function () {
+        const count = this.files.length;
+
+        if (count > 0) {
+            if (count === 1) {
+                labelText.textContent = `${count} foto seleccionada`;
+            } else {
+                labelText.textContent = `${count} fotos seleccionadas`;
+            }
+        } else {
+            labelText.textContent = "Elegir fotos";
+        }
+        });
+
+</script>
 </body>
 </html>

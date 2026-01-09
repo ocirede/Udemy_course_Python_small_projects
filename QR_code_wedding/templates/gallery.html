@@ -3,11 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Wedding Gallery</title>
-</head>
-<body>
-    <a href="/">Go back</a>
+    <link rel="stylesheet" href="/static/css/styles_gallery.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <h2>Wedding Gallery 📸</h2>
-    {{ gallery_pics|safe }}
+</head>
+<body class="gallery_body">
+  <a href="/"><i class="arrow fa-solid fa-arrow-left"></i></a>
+
+   <div class="gallery">
+    {% for url in gallery_pics %}
+        <a href="{{ url }}" target="_blank">
+            <img src="{{ url }}" alt="Wedding photo">
+        </a>
+    {% endfor %}
+</div>
+
+
 </body>
 </html>
