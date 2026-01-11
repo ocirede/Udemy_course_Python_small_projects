@@ -9,8 +9,9 @@ html, body {
 body {
 
     font-family: 'Inter', sans-serif;
-    background-image: url('https://www.transparenttextures.com/patterns/pw-maze-white.png');
-    position: relative;
+    background-image:
+        url('https://www.transparenttextures.com/patterns/rice-paper-3.png')
+        position: relative;
 }
 
 body::before {

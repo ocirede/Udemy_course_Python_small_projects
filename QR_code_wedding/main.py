@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session, url_for
+from flask import Flask, request, redirect, render_template, session, url_for, jsonify
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
@@ -24,16 +24,12 @@ cloudinary.config(
 
 @app.route("/", methods=["GET"])
 def index():
-    session.pop('language', None)  # Clear session when visiting root
+    session.pop('language', None)
     return render_template("index.html")
-
-
 
 
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
-    print(f"Upload route - Session language: {session.get('language')}")
-
     if request.method == "POST":
         files = request.files.getlist("file")
         uploaded_urls = []
@@ -46,15 +42,11 @@ def upload():
 
         # Check language AFTER processing files
         language = session.get('language')
-        print(f"After upload - Language in session: {language}")
 
         if language == 'it':
-            print("Returning Italian upload page")
             return render_template("upload.it.html")
 
-        print("Returning Spanish upload page")
         return render_template("upload.html")
-
     # For GET requests
     if session.get('language') == 'it':
         return render_template("upload.it.html")
@@ -64,25 +56,34 @@ def upload():
 
 @app.route("/gallery", methods=["GET"])
 def gallery():
-    next_cursor = None
-    all_urls = []
+    language = session.get('language')
+    cursor = request.args.get("cursor")
 
-    while True:
-        result = cloudinary.api.resources(
-            type="upload",
-            prefix="wedding-photos",
-            max_results=500,
-            next_cursor=next_cursor
-        )
-        resources = result.get("resources", [])
-        urls = [res["secure_url"] for res in resources]
-        all_urls.extend(urls)
+    result = cloudinary.api.resources(
+        type="upload",
+        prefix="wedding-photos",
+        max_results=10,
+        next_cursor=cursor
+    )
 
-        next_cursor = result["next_cursor"] if "next_cursor" in result else None
-        if not next_cursor:
-            break
+    urls = [res["secure_url"] for res in result.get("resources", [])]
+    next_cursor = result.get("next_cursor")
 
-    return render_template("gallery.html", gallery_pics=all_urls)
+    if not urls or not next_cursor:
+        next_cursor = None
+
+    if request.args.get("ajax"):
+        return jsonify({
+            "urls": urls,
+            "next_cursor": next_cursor
+        })
+
+    return render_template(
+        "gallery.html",
+        gallery_pics=urls,
+        next_cursor=next_cursor,
+        language= language
+    )
 
 
 @app.route("/it")
