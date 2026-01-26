@@ -138,10 +138,17 @@ def download_multiple():
         mimetype="application/zip"
     )
 
-@app.route("/it")
+@app.route("/it",  methods=["GET"])
 def italiano():
     session['language'] = 'it'
-    return render_template("index.it.html")
+    # Load first 10 photos from Cloudinary
+    result = cloudinary.api.resources(
+        type="upload",
+        prefix="wedding-photos",
+        max_results=10
+    )
+    urls = [res["secure_url"] for res in result.get("resources", [])]
+    return render_template("index.it.html", photos=urls)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000, debug=True)
