@@ -41,7 +41,6 @@ def index():
 
     return render_template("index.html", photos=urls, language=language)
 
-
 @app.route("/upload", methods=['POST'])
 def upload():
     files = request.files.getlist("file")
@@ -58,8 +57,6 @@ def upload():
             return jsonify({'error': str(e)}), 500
 
     return '', 204
-
-
 
 @app.route("/gallery", methods=["GET"])
 def gallery():
