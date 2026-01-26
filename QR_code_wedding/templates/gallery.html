@@ -6,99 +6,218 @@
     <link rel="stylesheet" href="/static/css/styles_gallery.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 </head>
 <body class="gallery_body">
 
-   <div class="gallery" id="gallery">
+<!-- LIGHTBOX -->
+<div id="lightbox" class="lightbox hidden">
+    <span class="close">&times;</span>
+    <img id="lightbox-img">
+    <a id="download-btn" download>
+        <i class="fas fa-download"></i>
+    </a>
+</div>
+
+<!-- MULTIPLE DOWNLOAD BUTTON -->
+<button id="download-multiple" title="Download Selected">
+    <i class="fas fa-download"></i>
+</button>
+
+<!-- GALLERY -->
+<div class="gallery" id="gallery">
     {% for url in gallery_pics %}
-        <a href="{{ url }}" target="_blank">
-            <img class="lazy" data-src="{{ url }}" alt="Wedding photo">
-        </a>
+    <div class="gallery-item">
+        <img class="lazy" data-src="{{ url }}" data-full="{{ url }}" alt="Wedding photo">
+        <input type="checkbox" class="select-img">
+    </div>
     {% endfor %}
 </div>
-   <div id="loading-indicator" style="display:none; text-align:center; padding:20px;">
-       {% if language == 'it' %}
-    <i class="fas fa-spinner fa-spin"></i>  Caricando foto...
-       {% else %}
-   <i class="fas fa-spinner fa-spin"></i>   Cargando fotos...
-       {% endif %}
 
+<!-- LOADING -->
+<div id="loading-indicator">
+    <i class="fas fa-spinner fa-spin"></i>
+    {% if language == 'it' %}Caricando foto...{% else %}Cargando fotos...{% endif %}
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
+    const gallery = document.getElementById("gallery");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    const downloadBtn = document.getElementById("download-btn");
+    const closeBtn = document.querySelector(".lightbox .close");
+    const downloadMultipleBtn = document.getElementById("download-multiple");
+    const loadingIndicator = document.getElementById("loading-indicator");
 
-    // Lazy-load function
-    const lazyload = (image) => {
-        image.src = image.dataset.src || image.src;
-        image.classList.remove("lazy");
-    };
+    let images = [];
+    let currentIndex = 0;
+    let nextCursor = "{{ next_cursor }}";
+    let loading = false;
+    let lastTap = 0; // needed for double-tap detection
 
-    // IntersectionObserver for lazy-loading
-    const lazyImageObserver = new IntersectionObserver((entries, observer) => {
+    // ======================
+    // LAZY LOAD
+    // ======================
+    const lazyObserver = new IntersectionObserver(entries => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                lazyload(entry.target);
-                observer.unobserve(entry.target);
+            if(entry.isIntersecting){
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove("lazy");
+                lazyObserver.unobserve(img);
             }
         });
     });
+    document.querySelectorAll(".gallery-item img.lazy").forEach(img => lazyObserver.observe(img));
 
-    // Observe existing lazy images
-    const lazyImages = document.querySelectorAll("img.lazy");
-    lazyImages.forEach(image => lazyImageObserver.observe(image));
+    // ======================
+    // REFRESH IMAGE ARRAY
+    // ======================
+    function refreshImages() {
+        images = Array.from(document.querySelectorAll(".gallery-item img"))
+                      .map(img => img.dataset.full);
+    }
 
+    // ======================
+    // SHOW LIGHTBOX
+    // ======================
+    function showModalImage() {
+        lightboxImg.src = images[currentIndex];
+        const url = encodeURIComponent(images[currentIndex]);
+        const filename = images[currentIndex].split("/").pop();
+        downloadBtn.href = `/download?url=${url}`;
+        downloadBtn.setAttribute("download", filename);
+    }
 
-    // ---------- Infinite scroll ----------
-    let nextCursor = "{{ next_cursor }}";
-    let loading = false;
+    function closeLightbox() {
+        lightbox.classList.add("hidden");
+        lightboxImg.src = "";
+        document.body.style.overflow = "";
+    }
 
-    const gallery = document.getElementById("gallery");
+    closeBtn.onclick = closeLightbox;
+    lightbox.addEventListener("click", e => { if(e.target === lightbox) closeLightbox(); });
 
+    // ======================
+    // MODAL SWIPE
+    // ======================
+    let touchStartX = 0;
+    let touchEndX = 0;
+    lightbox.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; });
+    lightbox.addEventListener("touchend", e => {
+        touchEndX = e.changedTouches[0].screenX;
+        const delta = touchStartX - touchEndX;
+        if(Math.abs(delta) > 50){
+            if(delta > 0){
+                currentIndex = (currentIndex + 1) % images.length;
+            } else {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+            }
+            showModalImage();
+        }
+    });
+
+    // Keyboard navigation
+    document.addEventListener("keydown", e => {
+        if(lightbox.classList.contains("hidden")) return;
+        if(e.key === "ArrowRight"){
+            currentIndex = (currentIndex + 1) % images.length;
+            showModalImage();
+        } else if(e.key === "ArrowLeft"){
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            showModalImage();
+        } else if(e.key === "Escape"){
+            closeLightbox();
+        }
+    });
+
+    // ======================
+    // GALLERY CLICK & SELECTION
+    // ======================
+    function bindGalleryItem(wrapper) {
+        const img = wrapper.querySelector("img");
+
+        wrapper.addEventListener("click", () => {
+            const now = Date.now();
+            const tapGap = now - lastTap;
+            lastTap = now;
+
+           if (tapGap < 300) {
+                // Double-tap → open modal
+                wrapper.classList.remove("selected"); // Clear selection on double-tap
+                refreshImages();
+                currentIndex = images.indexOf(img.dataset.full);
+                showModalImage();
+                lightbox.classList.remove("hidden");
+                document.body.style.overflow = "hidden";
+                downloadMultipleBtn.style.display = "none";
+
+                return;
+            }
+
+            // Single-tap → toggle selection
+            wrapper.classList.toggle("selected");
+
+            // Show/hide multiple download button
+            const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
+            downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
+
+        });
+    }
+
+    document.querySelectorAll(".gallery-item").forEach(bindGalleryItem);
+
+    // ======================
+    // MULTIPLE DOWNLOAD
+    // ======================
+    downloadMultipleBtn.addEventListener("click", () => {
+        const selectedImgs = Array.from(document.querySelectorAll(".gallery-item.selected img"))
+                                  .map(img => img.dataset.full);
+        if(!selectedImgs.length){ alert("Select at least one image!"); return; }
+        const query = selectedImgs.map(u => `url=${encodeURIComponent(u)}`).join("&");
+        window.location.href = `/download_multiple?${query}`;
+    });
+
+    // ======================
+    // INFINITE SCROLL
+    // ======================
     async function loadMore() {
-        if (!nextCursor || loading) return;
+        if(!nextCursor || loading) return;
+
         loading = true;
-        document.getElementById("loading-indicator").style.display = "block";
+        loadingIndicator.style.display = "block";
 
         try {
             const res = await fetch(`/gallery?cursor=${nextCursor}&ajax=1`);
             const data = await res.json();
 
             data.urls.forEach(url => {
-                const a = document.createElement("a");
-                a.href = url;
-                a.target = "_blank";
+                const wrapper = document.createElement("div");
+                wrapper.className = "gallery-item";
 
                 const img = document.createElement("img");
+                img.className = "lazy";
                 img.dataset.src = url;
+                img.dataset.full = url;
                 img.alt = "Wedding photo";
-                img.classList.add("lazy");
 
-                a.appendChild(img);
-                gallery.appendChild(a);
+                wrapper.appendChild(img);
+                gallery.appendChild(wrapper);
 
-                lazyImageObserver.observe(img);
+                lazyObserver.observe(img);
+                bindGalleryItem(wrapper);
             });
 
             nextCursor = data.next_cursor;
 
-        } catch (err) {
-            console.error("Error loading more images:", err);
-        }
-        document.getElementById("loading-indicator").style.display = "none";
+        } catch(err) { console.error(err); }
+
+        loadingIndicator.style.display = "none";
         loading = false;
     }
 
-    // Trigger load more on scroll
     window.addEventListener("scroll", () => {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 200) {
-            loadMore();
-        }
+        if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) loadMore();
     });
 });
 </script>
-
-
-</body>
-</html>
