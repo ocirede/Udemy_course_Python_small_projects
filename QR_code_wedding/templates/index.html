@@ -30,22 +30,22 @@
                 </p>
                 <i class="arrow fa-solid fa-arrow-right"></i>
                <label class="file-button">
-                    <span id="file-label-text">Elegir fotos</span>
+                    <span id="file-label-text">Elegir fotos o videos</span>
                     <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
                 </label>
             </div>
 
             <div class="step">
                 <p class="paragraphs_main_page">
-                    Y luego presiona este botón para subirlas.
+                    Y luego presiona este botón para subirlos.
                 </p>
                 <i class="arrow fa-solid fa-arrow-right"></i>
-                <button type="submit" id="submit-btn">Subir fotos</button>
+                <button type="submit" id="submit-btn">Subir fotos o videos</button>
             </div>
 
             <!-- Loading indicator -->
             <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
-                <p id="status-text">Comprimiendo fotos...</p>
+                <p id="status-text">Comprimiendo...</p>
                 <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
                     <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
                 </div>
@@ -55,9 +55,9 @@
              {% if photos %}
         <div class="step">
             <p class="paragraphs_main_page">
-            ¡Listo!, ahora si quieres ver las fotos puedes presionar este enlace
+            ¡Listo!, ahora si quieres ver las fotos y los videos puedes presionar este enlace
             </p>
-            <h3><a  href="{{url_for('gallery')}}">GALERIA DE FOTOS</a></h3>
+            <h3><a  href="{{url_for('gallery')}}">GALERIA</a></h3>
         </div>
             {% endif %}
 
