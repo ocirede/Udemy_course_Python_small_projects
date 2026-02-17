@@ -17,7 +17,7 @@ SESSION_KEY = os.getenv("SESSION_KEY")
 
 app = Flask(__name__)
 app.secret_key = SESSION_KEY
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+app.config['MAX_CONTENT_LENGTH'] = 600 * 1024 * 1024
 
 
 cloudinary.config(
@@ -44,48 +44,89 @@ def index():
 @app.route("/upload", methods=['POST'])
 def upload():
     files = request.files.getlist("file")
-    uploaded_urls = []
 
     for file in files:
         if file.filename == "":
             continue
+
         try:
-            result = cloudinary.uploader.upload(file, folder="wedding-photos")
-            uploaded_urls.append(result["secure_url"])
+            mimetype = file.mimetype or ""
+
+            # VIDEO
+            if mimetype.startswith("video"):
+                cloudinary.uploader.upload_large(
+                    file.stream,          # ✅ FIX
+                    resource_type="video",
+                    folder="wedding-photos",
+                    chunk_size=6000000
+                )
+
+            # IMAGE
+            else:
+                cloudinary.uploader.upload(
+                    file.stream,          # ✅ FIX
+                    resource_type="image",
+                    folder="wedding-photos"
+                )
+
         except Exception as e:
-            print(f"Upload error: {e}")
+            print("Upload error:", e)
             return jsonify({'error': str(e)}), 500
 
     return '', 204
 
 @app.route("/gallery", methods=["GET"])
 def gallery():
-    language = session.get('language')
+    language = session.get("language")
     cursor = request.args.get("cursor")
-    result = cloudinary.api.resources(
+
+    items = []
+
+    # ---------- IMAGES ----------
+    img_result = cloudinary.api.resources(
+        resource_type="image",
         type="upload",
         prefix="wedding-photos",
         max_results=10,
         next_cursor=cursor
     )
 
-    urls = [res["secure_url"] for res in result.get("resources", [])]
-    next_cursor = result.get("next_cursor")
+    for res in img_result.get("resources", []):
+        items.append({
+            "url": res["secure_url"],
+            "type": "image"
+        })
 
-    if not urls or not next_cursor:
-        next_cursor = ""
+    next_cursor = img_result.get("next_cursor") or ""
 
+    # ---------- VIDEOS (only first load) ----------
+    if not cursor:
+        vid_result = cloudinary.api.resources(
+            resource_type="video",
+            type="upload",
+            prefix="wedding-photos",
+            max_results=50
+        )
+
+        for res in vid_result.get("resources", []):
+            items.insert(0, {   # videos first
+                "url": res["secure_url"],
+                "type": "video"
+            })
+
+    # ---------- AJAX ----------
     if request.args.get("ajax"):
         return jsonify({
-            "urls": urls,
+            "urls": items,
             "next_cursor": next_cursor
         })
 
+    # ---------- FIRST PAGE ----------
     return render_template(
         "gallery.html",
-        gallery_pics=urls,
+        gallery_pics=items,
         next_cursor=next_cursor,
-        language= language
+        language=language
     )
 
 @app.route("/download")

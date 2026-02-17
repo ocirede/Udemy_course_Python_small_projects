@@ -26,9 +26,20 @@
 
 <!-- GALLERY -->
 <div class="gallery" id="gallery">
-    {% for url in gallery_pics %}
-    <div class="gallery-item">
-        <img class="lazy" data-src="{{ url }}" data-full="{{ url }}" alt="Wedding photo">
+    {% for item in gallery_pics %}
+    <div class="gallery-item {% if item.type == 'video' %}video{% endif %}">
+
+        {% if item.type == "video" %}
+            <video controls preload="metadata">
+                <source src="{{ item.url }}" type="video/mp4">
+            </video>
+        {% else %}
+            <img class="lazy"
+                 data-src="{{ item.url }}"
+                 data-full="{{ item.url }}"
+                 alt="Wedding photo">
+        {% endif %}
+
         <input type="checkbox" class="select-img">
     </div>
     {% endfor %}
@@ -183,39 +194,57 @@ document.addEventListener("DOMContentLoaded", () => {
     // INFINITE SCROLL
     // ======================
     async function loadMore() {
-        if(!nextCursor || loading) return;
+    if (!nextCursor || loading) return;
 
-        loading = true;
-        loadingIndicator.style.display = "block";
+    loading = true;
+    loadingIndicator.style.display = "block";
 
-        try {
-            const res = await fetch(`/gallery?cursor=${nextCursor}&ajax=1`);
-            const data = await res.json();
+    try {
+        const res = await fetch(`/gallery?cursor=${nextCursor}&ajax=1`);
+        const data = await res.json();
 
-            data.urls.forEach(url => {
-                const wrapper = document.createElement("div");
+        data.urls.forEach(item => {
+            const wrapper = document.createElement("div");
+
+            if (item.type === "video") {
+                wrapper.className = "gallery-item video";
+                wrapper.innerHTML = `
+                    <video controls preload="metadata">
+                        <source src="${item.url}" type="video/mp4">
+                    </video>
+                    <input type="checkbox" class="select-img">
+                `;
+            } else {
                 wrapper.className = "gallery-item";
 
                 const img = document.createElement("img");
                 img.className = "lazy";
-                img.dataset.src = url;
-                img.dataset.full = url;
+                img.dataset.src = item.url;
+                img.dataset.full = item.url;
                 img.alt = "Wedding photo";
 
                 wrapper.appendChild(img);
-                gallery.appendChild(wrapper);
+                wrapper.insertAdjacentHTML("beforeend",
+                    `<input type="checkbox" class="select-img">`
+                );
 
                 lazyObserver.observe(img);
-                bindGalleryItem(wrapper);
-            });
+            }
 
-            nextCursor = data.next_cursor;
+            gallery.appendChild(wrapper);
+            bindGalleryItem(wrapper);
+        });
 
-        } catch(err) { console.error(err); }
+        nextCursor = data.next_cursor || "";
 
-        loadingIndicator.style.display = "none";
-        loading = false;
+    } catch (err) {
+        console.error(err);
     }
+
+    loadingIndicator.style.display = "none";
+    loading = false;
+}
+
 
     window.addEventListener("scroll", () => {
         if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) loadMore();

@@ -40,6 +40,23 @@ body.gallery_body {
     transform: scale(0.95);
 }
 
+/* VIDEO ITEMS FULL WIDTH */
+.gallery-item.video {
+    grid-column: 1 / -1;
+    padding-top: 56.25%; /* 16:9 ratio */
+}
+
+/* VIDEO ELEMENT */
+.gallery-item.video video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
 /* MULTIPLE DOWNLOAD BUTTON */
 #download-multiple {
     position: fixed;
