@@ -12,64 +12,65 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="overlay">
-            <h1>Angélica e Matteo</h1>
-            <h2 id="title">Benvenuti nell'album di foto condivise</h2>
+   <div class="container">
+    <div class="overlay">
+        <h1>Angélica e Matteo</h1>
+        <div class="title_overlay">
+            <h2 id="title">Benvenuti all'album fotografico di gruppo</h2>
+        </div>
 
+        <p class="paragraphs_main_page">
+            Carica tutte le tue foto e i tuoi video per aiutarci a conservare ancora più ricordi di questo giorno così speciale.
+        </p>
+
+        <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
+
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    Premi questo pulsante per scegliere i tuoi file
+                </p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+                <label class="file-button">
+                    <span id="file-label-text">Scegli foto o video</span>
+                    <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
+                </label>
+            </div>
+
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    Poi premi questo pulsante per caricarli.
+                </p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+                <button type="submit" id="submit-btn">Carica foto o video</button>
+            </div>
+
+            <!-- Indicatore di caricamento -->
+            <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
+                <p id="status-text">Preparazione in corso...</p>
+                <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
+                    <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+            </div>
+
+        </form>
+
+        {% if photos %}
+        <div class="step">
             <p class="paragraphs_main_page">
-                Carica tutte le tue foto e permettici di avere ancora più ricordi di questo giorno così speciale.
+                Fatto! Se vuoi vedere le foto e i video, puoi cliccare su questo link:
             </p>
+            <h3><a href="{{ url_for('gallery') }}">GALLERIA</a></h3>
+        </div>
+        {% endif %}
 
-            <!-- ADD id="upload-form" -->
-            <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
-
-                <div class="step">
-                    <p class="paragraphs_main_page">
-                        Premi qui per scegliere le tue foto
-                    </p>
-                    <i class="arrow fa-solid fa-arrow-right"></i>
-
-                    <label class="file-button">
-                        <span id="file-label-text">Scegli foto o video</span>
-                        <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
-                    </label>
-                </div>
-
-                <div class="step">
-                    <p class="paragraphs_main_page">
-                        E poi qui per caricarle sul sito
-                    </p>
-                    <i class="arrow fa-solid fa-arrow-right"></i>
-                    <!-- ADD id="submit-btn" -->
-                    <button type="submit" id="submit-btn">Carica foto o video</button>
-                </div>
-
-                <!-- Loading indicator -->
-                <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
-                    <p id="status-text">Comprimendo...</p>
-                    <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
-                        <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
-                    </div>
-                </div>
-            </form>
-            {% if photos %}
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    Fatto! Ora se vuoi vedere le foto clicca qui:
-                </p>
-                <h3><a href="/gallery">GALLERIA</a></h3>
-            </div>
-            {% endif %}
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    Para español presiona:
-                </p>
-                <h4><a href="{{url_for('index')}}">AQUI</a></h4>
-            </div>
+        <div class="step">
+            <p class="paragraphs_main_page">
+                Per spagnolo, clicca:
+            </p>
+            <h4><a href="{{ url_for('index') }}">QUI</a></h4>
         </div>
     </div>
-
+</div>
 <script>
 const input = document.getElementById("file-input");
 const labelText = document.getElementById("file-label-text");

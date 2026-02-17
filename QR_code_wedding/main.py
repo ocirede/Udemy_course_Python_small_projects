@@ -109,7 +109,7 @@ def gallery():
                 resource_type="video",
                 type="upload",
                 prefix="wedding-photos",
-                max_results=500,  # maximum allowed per request
+                max_results=500,
                 next_cursor=next_vid_cursor
             )
 
