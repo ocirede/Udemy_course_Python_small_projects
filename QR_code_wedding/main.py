@@ -101,18 +101,31 @@ def gallery():
 
     # ---------- VIDEOS (only first load) ----------
     if not cursor:
-        vid_result = cloudinary.api.resources(
-            resource_type="video",
-            type="upload",
-            prefix="wedding-photos",
-            max_results=50
-        )
+        next_vid_cursor = None
+        all_videos = []
 
-        for res in vid_result.get("resources", []):
-            items.insert(0, {   # videos first
-                "url": res["secure_url"],
-                "type": "video"
-            })
+        while True:
+            vid_result = cloudinary.api.resources(
+                resource_type="video",
+                type="upload",
+                prefix="wedding-photos",
+                max_results=500,  # maximum allowed per request
+                next_cursor=next_vid_cursor
+            )
+
+            for res in vid_result.get("resources", []):
+                all_videos.append({
+                    "url": res["secure_url"],
+                    "type": "video"
+                })
+
+            next_vid_cursor = vid_result.get("next_cursor")
+            if not next_vid_cursor:
+                break  # no more videos
+
+        # Insert videos first
+        for video in reversed(all_videos):  # reverse to keep newest first
+            items.insert(0, video)
 
     # ---------- AJAX ----------
     if request.args.get("ajax"):
