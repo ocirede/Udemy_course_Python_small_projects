@@ -71,7 +71,6 @@
         </div>
     </div>
 <script>
-```javascript
 const input = document.getElementById("file-input");
 const labelText = document.getElementById("file-label-text");
 const form = document.getElementById("upload-form");
@@ -121,24 +120,30 @@ form.addEventListener("submit", async function(e) {
 
     try {
 
+        const isIOS =
+            /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
         let uploaded = 0;
 
         for (const file of files) {
 
             let fileToUpload = file;
 
-            /* IMAGE → compress */
             if (file.type.startsWith("image/")) {
 
-                statusText.textContent = "Comprimiendo imagen...";
-                fileToUpload = await imageCompression(file, compressionOptions);
+                if (isIOS) {
+                    statusText.textContent = "Preparando imagen...";
+                    fileToUpload = file;
+                } else {
+                    statusText.textContent = "Comprimiendo imagen...";
+                    fileToUpload = await imageCompression(file, compressionOptions);
+                }
 
-            }
-
-            /* VIDEO → keep original */
-            if (file.type.startsWith("video/")) {
+            } else if (file.type.startsWith("video/")) {
 
                 statusText.textContent = "Preparando video...";
+                fileToUpload = file;
 
             }
 
