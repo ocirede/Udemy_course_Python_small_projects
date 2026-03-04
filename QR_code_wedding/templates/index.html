@@ -79,10 +79,20 @@ const uploadStatus = document.getElementById("upload-status");
 const statusText = document.getElementById("status-text");
 const progressBar = document.getElementById("progress-bar");
 
+const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+const compressionOptions = {
+    maxSizeMB: 2,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    initialQuality: 0.85
+};
+
 /* Update selected file count */
 input.addEventListener("change", function () {
     const count = this.files.length;
-
     if (count > 0) {
         labelText.textContent = count === 1
             ? `${count} archivo seleccionado`
@@ -92,103 +102,88 @@ input.addEventListener("change", function () {
     }
 });
 
+/* Upload single file with optional retry */
+async function uploadWithRetry(formData, retries = 3) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+            if (!response.ok) throw new Error("Upload failed");
+            return response;
+        } catch (err) {
+            if (attempt === retries) throw err;
+            console.log(`Retry ${attempt}...`);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+    }
+}
+
+/* Split array into batches */
+function chunkArray(array, chunkSize) {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += chunkSize) {
+        chunks.push(array.slice(i, i + chunkSize));
+    }
+    return chunks;
+}
 
 form.addEventListener("submit", async function(e) {
-
     e.preventDefault();
 
     const files = Array.from(input.files);
-
     if (files.length === 0) return;
-
-    /* Limit batch uploads for stability */
-    if (files.length > 20) {
-        alert("Por favor sube máximo 20 archivos a la vez.");
-        return;
-    }
 
     submitBtn.disabled = true;
     uploadStatus.style.display = "block";
     progressBar.style.width = "0%";
 
-    const compressionOptions = {
-        maxSizeMB: 2,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        initialQuality: 0.85
-    };
+    // For iPhones, batch uploads in 5
+    const batchSize = isIOS ? 5 : 20;
+    const batches = chunkArray(files, batchSize);
 
     try {
+        let totalUploaded = 0;
+        const totalFiles = files.length;
 
-        const isIOS =
-            /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        for (const batch of batches) {
+            for (const file of batch) {
 
-        let uploaded = 0;
+                let fileToUpload = file;
 
-        for (const file of files) {
-
-            let fileToUpload = file;
-
-            if (file.type.startsWith("image/")) {
-
-                if (isIOS) {
-                    statusText.textContent = "Preparando imagen...";
-                    fileToUpload = file;
-                } else {
+                if (file.type.startsWith("image/") && !isIOS) {
                     statusText.textContent = "Comprimiendo imagen...";
                     fileToUpload = await imageCompression(file, compressionOptions);
+                } else if (file.type.startsWith("image/") && isIOS) {
+                    statusText.textContent = "Preparando imagen...";
+                } else if (file.type.startsWith("video/")) {
+                    statusText.textContent = "Preparando video...";
                 }
 
-            } else if (file.type.startsWith("video/")) {
+                statusText.textContent = "Subiendo archivo...";
 
-                statusText.textContent = "Preparando video...";
-                fileToUpload = file;
+                const formData = new FormData();
+                formData.append("file", fileToUpload);
 
+                await uploadWithRetry(formData);
+
+                totalUploaded++;
+                const percent = Math.round((totalUploaded / totalFiles) * 100);
+                progressBar.style.width = percent + "%";
             }
-
-            statusText.textContent = "Subiendo archivo...";
-
-            const formData = new FormData();
-            formData.append("file", fileToUpload);
-
-            const response = await fetch("/upload", {
-                method: "POST",
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error("Upload failed");
-            }
-
-            uploaded++;
-
-            const percent = Math.round((uploaded / files.length) * 100);
-            progressBar.style.width = percent + "%";
-
         }
 
         statusText.textContent = "¡Archivos subidos con éxito! 🎉";
-
-        setTimeout(() => {
-            window.location.href = "/";
-        }, 1200);
+        setTimeout(() => { window.location.href = "/"; }, 1200);
 
     } catch (err) {
-
         console.error(err);
-
         statusText.textContent = "Error al subir archivos";
-
         submitBtn.disabled = false;
         progressBar.style.width = "0%";
-
-        setTimeout(() => {
-            uploadStatus.style.display = "none";
-        }, 3000);
-
+        setTimeout(() => { uploadStatus.style.display = "none"; }, 3000);
     }
-
 });
 </script>
 </body>
