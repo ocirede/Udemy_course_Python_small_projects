@@ -174,7 +174,7 @@ form.addEventListener("submit", async function(e) {
                 }
 
                 /* VIDEO */
-                else if (
+               else if (
                     file.type.startsWith("video") ||
                     file.name.match(/\.(mp4|mov|m4v)$/i)
                 ) {
@@ -182,16 +182,14 @@ form.addEventListener("submit", async function(e) {
                         errDiv.textContent = `❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`;
                         errDiv.style.display = "block";
                         setTimeout(() => {
-                        errDiv.style.display = "none";
-                        errDiv.textContent = "";
-                        uploadStatus.style.display = "none";
-                        progressBar.style.width = "0%";
-                        input.value = "";
-                        labelText.textContent = "Scegli foto o video";
-                        submitBtn.disabled = false
-                    }, 4000);
-
-                    }
+                            errDiv.style.display = "none";
+                            errDiv.textContent = "";
+                            uploadStatus.style.display = "none";
+                            progressBar.style.width = "0%";
+                            input.value = "";
+                            labelText.textContent = "Scegli foto o video";
+                            submitBtn.disabled = false;
+                        }, 4000);
                     }
                     statusText.textContent = "Preparazione video...";
                     fileToUpload = file;
