@@ -7,8 +7,12 @@ from dotenv import load_dotenv
 from io import BytesIO
 import requests
 from zipfile import ZipFile
+from PIL import Image
+from pillow_heif import register_heif_opener
+import io
 
 load_dotenv()
+register_heif_opener()
 
 CLOUDINARY_NAME = os.getenv("CLOUDINARY_NAME")
 API_KEY = os.getenv("API_KEY")
@@ -62,8 +66,22 @@ def upload():
                     file.stream,
                     resource_type="video",
                     folder="wedding-photos",
-                    chunk_size=6_000_000,  # 6MB chunks
-                    timeout=600,           # optional timeout in seconds
+                    chunk_size=6_000_000,
+                    timeout=600,
+                    secure=True
+                )
+
+            # HEIC/HEIF — convert to JPEG first
+            elif file.filename.lower().endswith(('.heic', '.heif')) or mimetype in ('image/heic', 'image/heif'):
+                print(f"Converting HEIC image: {file.filename}")
+                img = Image.open(file.stream)
+                output = io.BytesIO()
+                img.convert("RGB").save(output, format="JPEG", quality=85)
+                output.seek(0)
+                cloudinary.uploader.upload(
+                    output,
+                    resource_type="image",
+                    folder="wedding-photos",
                     secure=True
                 )
 
@@ -82,7 +100,6 @@ def upload():
             return jsonify({'error': str(e)}), 500
 
     return jsonify({'success': True}), 200
-
 @app.route("/gallery", methods=["GET"])
 def gallery():
     language = session.get("language")

@@ -9,7 +9,6 @@
     <link rel="icon" href="/static/images/AM.jpg" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -116,16 +115,16 @@ async function uploadWithRetry(formData, retries = 3) {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve();
                     } else {
-                        reject(new Error("Upload failed"));
+                        reject(new Error("Caricamento fallito"));
                     }
                 };
-                xhr.onerror = () => reject(new Error("Network error"));
+                xhr.onerror = () => reject(new Error("Errore di rete"));
                 xhr.send(formData);
             });
             return;
         } catch (err) {
             if (attempt === retries) throw err;
-            console.log("Retry upload...");
+            console.log("Nuovo tentativo...");
             await new Promise(r => setTimeout(r, 1500));
         }
     }
@@ -164,58 +163,45 @@ form.addEventListener("submit", async function(e) {
             for (const file of batch) {
                 let fileToUpload = file;
 
-                /* IMAGE */
+                /* IMMAGINE */
                 if (file.type.startsWith("image/") || file.name.match(/\.(heic|heif)$/i)) {
-                    statusText.textContent = "Preparando imagen...";
-
-                    // Convert HEIC/HEIF to JPEG first
-                    if (file.type === "image/heic" || file.type === "image/heif" || file.name.match(/\.(heic|heif)$/i)) {
-                        statusText.textContent = "Convirtiendo imagen...";
+                    if (!isIOS && !file.name.match(/\.(heic|heif)$/i)) {
+                        statusText.textContent = "Compressione immagine...";
                         try {
-                            const convertedBlob = await heic2any({
-                                blob: file,
-                                toType: "image/jpeg",
-                                quality: 0.85
-                            });
-                            fileToUpload = new File([convertedBlob], file.name.replace(/\.(heic|heif)$/i, ".jpg"), { type: "image/jpeg" });
+                            fileToUpload = await imageCompression(file, compressionOptions);
                         } catch (e) {
-                            console.warn("HEIC conversion failed, uploading original:", e);
+                            console.warn("Compressione fallita, caricamento originale:", e);
                             fileToUpload = file;
                         }
-                    }
-
-                    // Compress
-                    try {
-                        statusText.textContent = "Comprimiendo imagen...";
-                        fileToUpload = await imageCompression(fileToUpload, compressionOptions);
-                    } catch (e) {
-                        console.warn("Compression failed, uploading original:", e);
+                    } else {
+                        statusText.textContent = "Preparazione immagine...";
                     }
                 }
 
                 /* VIDEO */
                 else if (
-                    file.ty12054pe.startsWith("video") ||
+                    file.type.startsWith("video") ||
                     file.name.match(/\.(mp4|mov|m4v)$/i)
                 ) {
                     if (file.size > 100 * 1024 * 1024) {
-                        errDiv.textContent = `❌ "${file.name}" es demasiado grande (${(file.size / 1024 / 1024).toFixed(0)}MB). El límite es 100MB. Por favor recorta o comprime el video antes de subirlo.`;
+                        errDiv.textContent = `❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`;
                         errDiv.style.display = "block";
                         setTimeout(() => {
-                        errDiv.style.display = "none";
-                        errDiv.textContent = "";
-                        uploadStatus.style.display = "none";
-                        progressBar.style.width = "0%";
-                        input.value = "";
-                        labelText.textContent = "Elegir fotos o videos";
-                        submitBtn.disabled = false;
-                    }, 5000);
+                            errDiv.style.display = "none";
+                            errDiv.textContent = "";
+                            uploadStatus.style.display = "none";
+                            progressBar.style.width = "0%";
+                            input.value = "";
+                            labelText.textContent = "Scegli foto o video";
+                            submitBtn.disabled = false;
+                        }, 5000);
+                        continue;
                     }
-                    statusText.textContent = "Preparando video...";
+                    statusText.textContent = "Preparazione video...";
                     fileToUpload = file;
                 }
 
-                statusText.textContent = `Subiendo archivo ${uploaded + 1} de ${totalFiles}...`;
+                statusText.textContent = `Caricamento file ${uploaded + 1} di ${totalFiles}...`;
 
                 const formData = new FormData();
                 formData.append("file", fileToUpload);
@@ -230,7 +216,7 @@ form.addEventListener("submit", async function(e) {
 
         if (uploaded > 0) {
             progressBar.style.width = "100%";
-            statusText.textContent = "¡Archivos subidos con éxito! 🎉";
+            statusText.textContent = "File caricati con successo! 🎉";
             setTimeout(() => {
                 window.location.href = "/";
             }, 1200);
@@ -241,7 +227,7 @@ form.addEventListener("submit", async function(e) {
 
     } catch (err) {
         console.error(err);
-        statusText.textContent = "Error al subir archivos";
+        statusText.textContent = "Errore durante il caricamento";
         submitBtn.disabled = false;
         progressBar.style.width = "0%";
         setTimeout(() => {
