@@ -42,7 +42,6 @@ def index():
     return render_template("index.html", photos=urls, language=language)
 
 @app.route("/upload", methods=['POST'])
-@app.route("/upload", methods=["POST"])
 def upload():
     files = request.files.getlist("file")
 
