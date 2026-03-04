@@ -194,12 +194,12 @@ form.addEventListener("submit", async function(e) {
                 }
 
                 /* VIDEO */
-                else if (file.type && file.type.startsWith("video")) {
-
+                else if (
+                    file.type.startsWith("video") ||
+                    file.name.match(/\.(mp4|mov|m4v)$/i)
+                ) {
                     statusText.textContent = "Preparando video...";
-
                     fileToUpload = file;
-
                 }
 
                 statusText.textContent = "Subiendo archivo...";
