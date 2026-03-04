@@ -179,18 +179,15 @@ form.addEventListener("submit", async function(e) {
                     file.name.match(/\.(mp4|mov|m4v)$/i)
                 ) {
                     if (file.size > 100 * 1024 * 1024) {
-                        errDiv.textContent = `❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). El límite es 100MB. Por favor recorta o comprime el video antes de subirlo.`;
+                        errDiv.textContent = `❌ "${file.name}" es demasiado grande (${(file.size / 1024 / 1024).toFixed(0)}MB). El límite es 100MB. Por favor recorta o comprime el video antes de subirlo.`;
                         errDiv.style.display = "block";
-                        uploaded++;
-                        const percent = Math.round((uploaded / totalFiles) * 100);
-                        progressBar.style.width = percent + "%";
                         continue;
                     }
-                    statusText.textContent = "Preparazione video...";
+                    statusText.textContent = "Preparando video...";
                     fileToUpload = file;
                 }
 
-                statusText.textContent = `Caricando file ${uploaded + 1} di ${totalFiles}...`;
+                statusText.textContent = `Subiendo archivo ${uploaded + 1} de ${totalFiles}...`;
 
                 const formData = new FormData();
                 formData.append("file", fileToUpload);
@@ -203,12 +200,16 @@ form.addEventListener("submit", async function(e) {
             }
         }
 
-        progressBar.style.width = "100%";
-        statusText.textContent = "¡Archivos subidos con éxito! 🎉";
-
-        setTimeout(() => {
-            window.location.href = "/";
-        }, 1200);
+        if (uploaded > 0) {
+            progressBar.style.width = "100%";
+            statusText.textContent = "¡Archivos subidos con éxito! 🎉";
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 1200);
+        } else {
+            uploadStatus.style.display = "none";
+            submitBtn.disabled = false;
+        }
 
     } catch (err) {
         console.error(err);
