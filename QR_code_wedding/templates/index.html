@@ -81,7 +81,7 @@ const progressBar = document.getElementById("progress-bar");
 
 const isIOS =
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
 const compressionOptions = {
     maxSizeMB: 2,
@@ -105,36 +105,49 @@ input.addEventListener("change", function () {
 
 });
 
-/* Retry upload if connection fails */
+/* Upload using XMLHttpRequest (better for mobile videos) */
 async function uploadWithRetry(formData, retries = 3) {
 
     for (let attempt = 1; attempt <= retries; attempt++) {
 
         try {
 
-            const response = await fetch("/upload", {
-                method: "POST",
-                body: formData
+            await new Promise((resolve, reject) => {
+
+                const xhr = new XMLHttpRequest();
+
+                xhr.open("POST", "/upload", true);
+
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve();
+                    } else {
+                        reject(new Error("Upload failed"));
+                    }
+                };
+
+                xhr.onerror = () => reject(new Error("Network error"));
+
+                xhr.send(formData);
+
             });
 
-            if (!response.ok) throw new Error("Upload failed");
-
-            return response;
+            return;
 
         } catch (err) {
 
             if (attempt === retries) throw err;
 
             console.log("Retry upload...");
+            await new Promise(r => setTimeout(r, 1500));
 
-            await new Promise(resolve => setTimeout(resolve, 1500));
         }
 
     }
 
 }
 
-/* Split files into batches */
+/* Split files into batches (important for mobile stability) */
 function chunkArray(array, size) {
 
     const result = [];
@@ -193,18 +206,23 @@ form.addEventListener("submit", async function(e) {
                 }
 
                 /* VIDEO */
-                else if (file.type && file.type.startsWith("video")) {
+                else if (
+                    file.type.startsWith("video") ||
+                    file.name.match(/\.(mp4|mov|m4v)$/i)
+                ) {
+
+                    if (file.size > 300 * 1024 * 1024) {
+                        alert("El video es demasiado grande. Intenta subir uno menor de 300MB.");
+                        continue;
+                    }
 
                     statusText.textContent = "Preparando video...";
-
                     fileToUpload = file;
-
                 }
 
-                statusText.textContent = "Subiendo archivo...";
+                statusText.textContent = `Subiendo archivo ${uploaded + 1} de ${totalFiles}...`;
 
                 const formData = new FormData();
-
                 formData.append("file", fileToUpload);
 
                 await uploadWithRetry(formData);
