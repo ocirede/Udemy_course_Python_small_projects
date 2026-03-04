@@ -9,67 +9,60 @@
     <link rel="icon" href="/static/images/AM.jpg" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.0/dist/ffmpeg.min.js"></script>
 </head>
 <body>
-  <div class="container">
-        <div class="overlay">
-            <h1>Angélica y Matteo</h1>
-            <div class="title_overlay">
-                <h2 id="title">Bienvenidos al álbum grupal de fotos</h2>
+<div class="container">
+    <div class="overlay">
+        <h1>Angélica y Matteo</h1>
+        <div class="title_overlay">
+            <h2 id="title">Bienvenidos al álbum grupal de fotos</h2>
+        </div>
+
+        <p class="paragraphs_main_page">
+            Sube todas tus fotos y videos para ayudarnos a tener aún más recuerdos de este día tan especial.
+        </p>
+
+        <form method="POST" enctype="multipart/form-data" id="upload-form">
+            <div class="step">
+                <p class="paragraphs_main_page">Presiona este botón para elegir tus archivos</p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+                <label class="file-button">
+                    <span id="file-label-text">Elegir fotos o videos</span>
+                    <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
+                </label>
             </div>
 
+            <div class="step">
+                <p class="paragraphs_main_page">Luego presiona este botón para subirlos.</p>
+                <i class="arrow fa-solid fa-arrow-right"></i>
+                <button type="submit" id="submit-btn">Subir fotos o videos</button>
+            </div>
+
+            <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
+                <p id="status-text">Preparando...</p>
+                <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
+                    <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+            </div>
+        </form>
+
+        {% if photos %}
+        <div class="step">
             <p class="paragraphs_main_page">
-                Sube todas tus fotos y videos para ayudarnos a tener aún más recuerdos de este día tan especial.
+                ¡Listo! Si quieres ver las fotos y videos, puedes hacer clic en este enlace:
             </p>
+            <h3><a href="{{ url_for('gallery') }}">GALERÍA</a></h3>
+        </div>
+        {% endif %}
 
-            <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
-
-                <div class="step">
-                    <p class="paragraphs_main_page">
-                        Presiona este botón para elegir tus archivos
-                    </p>
-                    <i class="arrow fa-solid fa-arrow-right"></i>
-                    <label class="file-button">
-                        <span id="file-label-text">Elegir fotos o videos</span>
-                        <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
-                    </label>
-                </div>
-
-                <div class="step">
-                    <p class="paragraphs_main_page">
-                        Luego presiona este botón para subirlos.
-                    </p>
-                    <i class="arrow fa-solid fa-arrow-right"></i>
-                    <button type="submit" id="submit-btn">Subir fotos o videos</button>
-                </div>
-
-                <!-- Indicador de carga -->
-                <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
-                    <p id="status-text">Preparando...</p>
-                    <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
-                        <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
-                    </div>
-                </div>
-
-            </form>
-
-            {% if photos %}
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    ¡Listo! Si quieres ver las fotos y videos, puedes hacer clic en este enlace:
-                </p>
-                <h3><a href="{{ url_for('gallery') }}">GALERÍA</a></h3>
-            </div>
-            {% endif %}
-
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    Per italiano, clicca:
-                </p>
-                <h4><a href="{{ url_for('italiano') }}">QUI</a></h4>
-            </div>
+        <div class="step">
+            <p class="paragraphs_main_page">Per italiano, clicca:</p>
+            <h4><a href="{{ url_for('italiano') }}">QUI</a></h4>
         </div>
     </div>
+</div>
+
 <script>
 const input = document.getElementById("file-input");
 const labelText = document.getElementById("file-label-text");
@@ -79,188 +72,112 @@ const uploadStatus = document.getElementById("upload-status");
 const statusText = document.getElementById("status-text");
 const progressBar = document.getElementById("progress-bar");
 
-const isIOS =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-const compressionOptions = {
-    maxSizeMB: 2,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-    initialQuality: 0.85
-};
+const ffmpeg = FFmpeg.createFFmpeg({ log: true });
 
-/* Update selected file count */
-input.addEventListener("change", function () {
-
-    const count = this.files.length;
-
-    if (count > 0) {
-        labelText.textContent = count === 1
-            ? `${count} archivo seleccionado`
-            : `${count} archivos seleccionados`;
-    } else {
-        labelText.textContent = "Elegir fotos o videos";
-    }
-
+input.addEventListener("change", () => {
+    const count = input.files.length;
+    labelText.textContent = count ? `${count} file${count > 1 ? 's' : ''} selected` : "Elegir fotos o videos";
 });
 
-/* Upload using XMLHttpRequest (better for mobile videos) */
-async function uploadWithRetry(formData, retries = 3) {
+// Compress video using ffmpeg.wasm
+async function compressVideo(file) {
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+    const fileName = file.name;
+    ffmpeg.FS('writeFile', fileName, await fetchFile(file));
+    const outputName = 'compressed_' + fileName;
 
-    for (let attempt = 1; attempt <= retries; attempt++) {
+    await ffmpeg.run(
+        '-i', fileName,
+        '-b:v', '1M',           // target video bitrate
+        '-vf', 'scale=1280:-2', // resize width 1280, keep aspect
+        '-c:a', 'aac',
+        '-strict', 'experimental',
+        outputName
+    );
 
-        try {
-
-            await new Promise((resolve, reject) => {
-
-                const xhr = new XMLHttpRequest();
-
-                xhr.open("POST", "/upload", true);
-
-                xhr.onload = function () {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve();
-                    } else {
-                        reject(new Error("Upload failed"));
-                    }
-                };
-
-                xhr.onerror = () => reject(new Error("Network error"));
-
-                xhr.send(formData);
-
-            });
-
-            return;
-
-        } catch (err) {
-
-            if (attempt === retries) throw err;
-
-            console.log("Retry upload...");
-            await new Promise(r => setTimeout(r, 1500));
-
-        }
-
-    }
-
+    const data = ffmpeg.FS('readFile', outputName);
+    return new File([data.buffer], fileName, { type: file.type });
 }
 
-/* Split files into batches (important for mobile stability) */
-function chunkArray(array, size) {
-
-    const result = [];
-
-    for (let i = 0; i < array.length; i += size) {
-        result.push(array.slice(i, i + size));
+// Upload with XMLHttpRequest (better for mobile large files)
+async function uploadWithRetry(formData, retries = 3) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/upload", true);
+                xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Upload failed"));
+                xhr.onerror = () => reject(new Error("Network error"));
+                xhr.send(formData);
+            });
+            return;
+        } catch (err) {
+            if (attempt === retries) throw err;
+            console.log("Retry upload...");
+            await new Promise(r => setTimeout(r, 1500));
+        }
     }
+}
 
+function chunkArray(array, size) {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) result.push(array.slice(i, i + size));
     return result;
 }
 
-form.addEventListener("submit", async function(e) {
-
+form.addEventListener("submit", async (e) => {
     e.preventDefault();
-
     const files = Array.from(input.files);
-
-    if (files.length === 0) return;
+    if (!files.length) return;
 
     submitBtn.disabled = true;
-
     uploadStatus.style.display = "block";
-
     progressBar.style.width = "2%";
-    progressBar.style.backgroundColor = "#4CAF50";
 
-    const batchSize = isIOS ? 5 : 20;
+    const batchSize = isIOS ? 2 : 10; // smaller batch for mobile stability
     const batches = chunkArray(files, batchSize);
 
     try {
-
         let uploaded = 0;
         const totalFiles = files.length;
 
         for (const batch of batches) {
-
             for (const file of batch) {
-
                 let fileToUpload = file;
 
-                /* IMAGE */
-                if (file.type.startsWith("image/")) {
-
-                    if (!isIOS) {
-
-                        statusText.textContent = "Comprimiendo imagen...";
-
-                        fileToUpload = await imageCompression(file, compressionOptions);
-
-                    } else {
-
-                        statusText.textContent = "Preparando imagen...";
-
-                    }
-
-                }
-
-                /* VIDEO */
-                else if (
-                    file.type.startsWith("video") ||
-                    file.name.match(/\.(mp4|mov|m4v)$/i)
-                ) {
-
-                    if (file.size > 300 * 1024 * 1024) {
-                        alert("El video es demasiado grande. Intenta subir uno menor de 300MB.");
-                        continue;
-                    }
-
-                    statusText.textContent = "Preparando video...";
-                    fileToUpload = file;
+                if (file.type.startsWith("image/") && !isIOS) {
+                    statusText.textContent = "Comprimiendo imagen...";
+                    fileToUpload = await imageCompression(file, { maxSizeMB: 2, maxWidthOrHeight: 1920 });
+                } else if (file.type.startsWith("video/")) {
+                    statusText.textContent = "Comprimiendo video (puede tardar)...";
+                    fileToUpload = await compressVideo(file);
+                } else if (file.type.startsWith("image/") && isIOS) {
+                    statusText.textContent = "Preparando imagen...";
                 }
 
                 statusText.textContent = `Subiendo archivo ${uploaded + 1} de ${totalFiles}...`;
-
                 const formData = new FormData();
                 formData.append("file", fileToUpload);
 
                 await uploadWithRetry(formData);
-
                 uploaded++;
-
-                const percent = Math.round((uploaded / totalFiles) * 100);
-
-                progressBar.style.width = percent + "%";
-
+                progressBar.style.width = `${Math.round((uploaded / totalFiles) * 100)}%`;
             }
-
         }
 
-        progressBar.style.width = "100%";
-
         statusText.textContent = "¡Archivos subidos con éxito! 🎉";
-
-        setTimeout(() => {
-            window.location.href = "/";
-        }, 1200);
+        progressBar.style.width = "100%";
+        setTimeout(() => window.location.href = "/", 1200);
 
     } catch (err) {
-
         console.error(err);
-
         statusText.textContent = "Error al subir archivos";
-
         submitBtn.disabled = false;
-
         progressBar.style.width = "0%";
-
-        setTimeout(() => {
-            uploadStatus.style.display = "none";
-        }, 3000);
-
+        setTimeout(() => { uploadStatus.style.display = "none"; }, 3000);
     }
-
 });
 </script>
 </body>
