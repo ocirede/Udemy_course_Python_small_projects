@@ -181,9 +181,15 @@ form.addEventListener("submit", async function(e) {
                     if (file.size > 100 * 1024 * 1024) {
                         errDiv.textContent = `❌ "${file.name}" es demasiado grande (${(file.size / 1024 / 1024).toFixed(0)}MB). El límite es 100MB. Por favor recorta o comprime el video antes de subirlo.`;
                         errDiv.style.display = "block";
-                         setTimeout(() => {
-                         window.location.href = "/";
-                    }, 1200)
+                        setTimeout(() => {
+                        errDiv.style.display = "none";
+                        errDiv.textContent = "";
+                        uploadStatus.style.display = "none";
+                        progressBar.style.width = "0%";
+                        input.value = "";
+                        labelText.textContent = "Elegir fotos o videos";
+                        submitBtn.disabled = false;
+                    }, 4000);
                     }
                     statusText.textContent = "Preparando video...";
                     fileToUpload = file;
