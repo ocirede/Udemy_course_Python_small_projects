@@ -118,15 +118,14 @@
                 };
 
                 xhr.onload = () => {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        resolve(JSON.parse(xhr.responseText));
-                    } else {
-                        const err = JSON.parse(xhr.responseText);
-                        reject(new Error(err.error?.message || "Upload failed"));
-                    }
-                };
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(JSON.parse(xhr.responseText));
+                } else {
+                    reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText}`));
+                }
+            };
 
-                xhr.onerror = () => reject(new Error("Network error"));
+                xhr.onerror = () => reject(new Error(`Network error — status: ${xhr.status}, readyState: ${xhr.readyState}, url: ${UPLOAD_URL}`));
                 xhr.send(formData);
             });
         }
