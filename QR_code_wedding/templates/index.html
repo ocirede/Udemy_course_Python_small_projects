@@ -71,6 +71,7 @@
         </div>
     </div>
 <script>
+```javascript
 const input = document.getElementById("file-input");
 const labelText = document.getElementById("file-label-text");
 const form = document.getElementById("upload-form");
@@ -79,7 +80,7 @@ const uploadStatus = document.getElementById("upload-status");
 const statusText = document.getElementById("status-text");
 const progressBar = document.getElementById("progress-bar");
 
-// Update file count
+/* Update selected file count */
 input.addEventListener("change", function () {
     const count = this.files.length;
 
@@ -92,11 +93,20 @@ input.addEventListener("change", function () {
     }
 });
 
+
 form.addEventListener("submit", async function(e) {
+
     e.preventDefault();
 
     const files = Array.from(input.files);
+
     if (files.length === 0) return;
+
+    /* Limit batch uploads for stability */
+    if (files.length > 20) {
+        alert("Por favor sube máximo 20 archivos a la vez.");
+        return;
+    }
 
     submitBtn.disabled = true;
     uploadStatus.style.display = "block";
@@ -110,54 +120,70 @@ form.addEventListener("submit", async function(e) {
     };
 
     try {
-        const finalFiles = [];
-        let processed = 0;
+
+        let uploaded = 0;
 
         for (const file of files) {
 
-            // IMAGE → compress
+            let fileToUpload = file;
+
+            /* IMAGE → compress */
             if (file.type.startsWith("image/")) {
-                statusText.textContent = `Comprimiendo imagen...`;
-                const compressed = await imageCompression(file, compressionOptions);
-                finalFiles.push(compressed);
+
+                statusText.textContent = "Comprimiendo imagen...";
+                fileToUpload = await imageCompression(file, compressionOptions);
+
             }
 
-            // VIDEO → keep original
-            else if (file.type.startsWith("video/")) {
-                statusText.textContent = `Preparando video...`;
-                finalFiles.push(file);
+            /* VIDEO → keep original */
+            if (file.type.startsWith("video/")) {
+
+                statusText.textContent = "Preparando video...";
+
             }
 
-            processed++;
-            progressBar.style.width = (processed / files.length * 60) + "%";
+            statusText.textContent = "Subiendo archivo...";
+
+            const formData = new FormData();
+            formData.append("file", fileToUpload);
+
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error("Upload failed");
+            }
+
+            uploaded++;
+
+            const percent = Math.round((uploaded / files.length) * 100);
+            progressBar.style.width = percent + "%";
+
         }
 
-        statusText.textContent = "Subiendo archivos...";
+        statusText.textContent = "¡Archivos subidos con éxito! 🎉";
 
-        const formData = new FormData();
-        finalFiles.forEach(f => formData.append("file", f));
-
-        const response = await fetch("/upload", {
-            method: "POST",
-            body: formData
-        });
-
-        progressBar.style.width = "100%";
-
-        if (response.ok) {
-            statusText.textContent = "¡Archivos subidos con éxito! 🎉";
-            setTimeout(() => window.location.href = "/", 1200);
-        } else {
-            throw new Error("Upload failed");
-        }
+        setTimeout(() => {
+            window.location.href = "/";
+        }, 1200);
 
     } catch (err) {
+
         console.error(err);
+
         statusText.textContent = "Error al subir archivos";
+
         submitBtn.disabled = false;
         progressBar.style.width = "0%";
-        setTimeout(() => uploadStatus.style.display = "none", 3000);
+
+        setTimeout(() => {
+            uploadStatus.style.display = "none";
+        }, 3000);
+
     }
+
 });
 </script>
 </body>
