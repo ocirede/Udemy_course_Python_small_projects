@@ -22,32 +22,36 @@
                 Sube todas tus fotos y videos para ayudarnos a tener aún más recuerdos de este día tan especial.
             </p>
 
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    Presiona este botón para elegir tus archivos
-                </p>
-                <i class="arrow fa-solid fa-arrow-right"></i>
-                <label class="file-button">
-                    <span id="file-label-text">Elegir fotos o videos</span>
-                    <input type="file" name="file" accept="image/*, video/*" multiple id="file-input">
-                </label>
-            </div>
+            <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
 
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    Luego presiona este botón para subirlos.
-                </p>
-                <i class="arrow fa-solid fa-arrow-right"></i>
-                <button type="button" id="submit-btn">Subir fotos o videos</button>
-            </div>
-
-            <!-- Indicador de carga -->
-            <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
-                <p id="status-text">Preparando...</p>
-                <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
-                    <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                <div class="step">
+                    <p class="paragraphs_main_page">
+                        Presiona este botón para elegir tus archivos
+                    </p>
+                    <i class="arrow fa-solid fa-arrow-right"></i>
+                    <label class="file-button">
+                        <span id="file-label-text">Elegir fotos o videos</span>
+                        <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
+                    </label>
                 </div>
-            </div>
+
+                <div class="step">
+                    <p class="paragraphs_main_page">
+                        Luego presiona este botón para subirlos.
+                    </p>
+                    <i class="arrow fa-solid fa-arrow-right"></i>
+                    <button type="submit" id="submit-btn">Subir fotos o videos</button>
+                </div>
+
+                <!-- Indicador de carga -->
+                <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
+                    <p id="status-text">Preparando...</p>
+                    <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
+                        <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+
+            </form>
 
             {% if photos %}
             <div class="step">
@@ -66,138 +70,148 @@
             </div>
         </div>
     </div>
-
 <script>
-        const CLOUD_NAME = "dqsfskx21";
-        const UPLOAD_PRESET = "jz0gjwmh";
-        const UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+const input = document.getElementById("file-input");
+const labelText = document.getElementById("file-label-text");
+const form = document.getElementById("upload-form");
+const submitBtn = document.getElementById("submit-btn");
+const uploadStatus = document.getElementById("upload-status");
+const statusText = document.getElementById("status-text");
+const progressBar = document.getElementById("progress-bar");
 
-        const input = document.getElementById("file-input");
-        const labelText = document.getElementById("file-label-text");
-        const submitBtn = document.getElementById("submit-btn");
-        const uploadStatus = document.getElementById("upload-status");
-        const statusText = document.getElementById("status-text");
-        const progressBar = document.getElementById("progress-bar");
+const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-        const isIOS =
-            /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const compressionOptions = {
+    maxSizeMB: 2,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    initialQuality: 0.85
+};
 
-        const compressionOptions = {
-            maxSizeMB: 2,
-            maxWidthOrHeight: 1920,
-            useWebWorker: true,
-            initialQuality: 0.85
-        };
+input.addEventListener("change", function () {
+    const count = this.files.length;
+    if (count > 0) {
+        labelText.textContent = count === 1
+            ? `${count} archivo seleccionado`
+            : `${count} archivos seleccionados`;
+    } else {
+        labelText.textContent = "Elegir fotos o videos";
+    }
+});
 
-        input.addEventListener("change", function () {
-            const count = this.files.length;
-            if (count > 0) {
-                labelText.textContent = count === 1
-                    ? `${count} archivo seleccionado`
-                    : `${count} archivos seleccionados`;
-            } else {
-                labelText.textContent = "Elegir fotos o videos";
-            }
-        });
-
-        async function uploadToCloudinary(file, onProgress) {
-            return new Promise((resolve, reject) => {
-                const formData = new FormData();
-                formData.append("file", file);
-                formData.append("upload_preset", UPLOAD_PRESET);
-                formData.append("asset_folder", "wedding-photos");
-
+async function uploadWithRetry(formData, retries = 3) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
-                xhr.open("POST", UPLOAD_URL, true);
-
-                xhr.upload.onprogress = (e) => {
-                    if (e.lengthComputable && onProgress) {
-                        onProgress(e.loaded / e.total);
+                xhr.open("POST", "/upload", true);
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve();
+                    } else {
+                        reject(new Error("Upload failed"));
                     }
                 };
-
-                xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve(JSON.parse(xhr.responseText));
-                } else {
-                    reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText}`));
-                }
-            };
-
-                xhr.onerror = () => reject(new Error(`Network error — status: ${xhr.status}, readyState: ${xhr.readyState}, url: ${UPLOAD_URL}`));
+                xhr.onerror = () => reject(new Error("Network error"));
                 xhr.send(formData);
             });
+            return;
+        } catch (err) {
+            if (attempt === retries) throw err;
+            console.log("Retry upload...");
+            await new Promise(r => setTimeout(r, 1500));
         }
+    }
+}
 
-        function chunkArray(array, size) {
-            const result = [];
-            for (let i = 0; i < array.length; i += size) {
-                result.push(array.slice(i, i + size));
-            }
-            return result;
-        }
+function chunkArray(array, size) {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) {
+        result.push(array.slice(i, i + size));
+    }
+    return result;
+}
 
-        submitBtn.addEventListener("click", async function () {
-            const files = Array.from(input.files);
-            if (files.length === 0) {
-                alert("Por favor selecciona al menos un archivo.");
-                return;
-            }
+form.addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-            submitBtn.disabled = true;
-            uploadStatus.style.display = "block";
-            progressBar.style.width = "2%";
-            progressBar.style.backgroundColor = "#4CAF50";
+    const files = Array.from(input.files);
+    if (files.length === 0) return;
 
-            const batchSize = isIOS ? 3 : 10;
-            const batches = chunkArray(files, batchSize);
-            let uploaded = 0;
-            const totalFiles = files.length;
+    submitBtn.disabled = true;
+    uploadStatus.style.display = "block";
+    progressBar.style.width = "2%";
+    progressBar.style.backgroundColor = "#4CAF50";
 
-            try {
-                for (const batch of batches) {
-                    for (const file of batch) {
-                        let fileToUpload = file;
+    const batchSize = isIOS ? 5 : 20;
+    const batches = chunkArray(files, batchSize);
 
-                        if (file.type.startsWith("image/")) {
-                            if (!isIOS) {
-                                statusText.textContent = `Comprimiendo imagen ${uploaded + 1} de ${totalFiles}...`;
-                                fileToUpload = await imageCompression(file, compressionOptions);
-                            } else {
-                                statusText.textContent = `Preparando imagen ${uploaded + 1} de ${totalFiles}...`;
-                            }
-                        } else {
-                            statusText.textContent = `Subiendo video ${uploaded + 1} de ${totalFiles}... ⏳`;
-                        }
+    try {
+        let uploaded = 0;
+        const totalFiles = files.length;
 
-                        await uploadToCloudinary(fileToUpload, (fileProgress) => {
-                            const basePercent = (uploaded / totalFiles) * 100;
-                            const filePercent = (fileProgress / totalFiles) * 100;
-                            progressBar.style.width = Math.round(basePercent + filePercent) + "%";
-                        });
+        for (const batch of batches) {
+            for (const file of batch) {
+                let fileToUpload = file;
 
-                        uploaded++;
-                        progressBar.style.width = Math.round((uploaded / totalFiles) * 100) + "%";
+                /* IMAGE */
+                if (file.type.startsWith("image/")) {
+                    if (!isIOS) {
+                        statusText.textContent = "Comprimiendo imagen...";
+                        fileToUpload = await imageCompression(file, compressionOptions);
+                    } else {
+                        statusText.textContent = "Preparando imagen...";
                     }
                 }
 
-                progressBar.style.width = "100%";
-                statusText.textContent = "¡Archivos subidos con éxito! 🎉";
-                setTimeout(() => { window.location.href = "/"; }, 1200);
+                /* VIDEO */
+                else if (
+                    file.type.startsWith("video") ||
+                    file.name.match(/\.(mp4|mov|m4v)$/i)
+                ) {
+                    if (file.size > 100 * 1024 * 1024) {
+                        alert(`❌ "${file.name}" es demasiado grande (${(file.size / 1024 / 1024).toFixed(0)}MB). El límite es 100MB. Por favor recorta o comprime el video antes de subirlo.`);
+                        uploaded++;
+                        const percent = Math.round((uploaded / totalFiles) * 100);
+                        progressBar.style.width = percent + "%";
+                        continue;
+                    }
+                    statusText.textContent = "Preparando video...";
+                    fileToUpload = file;
+                }
 
-            } catch (err) {
-                console.error(err);
-                statusText.textContent = `Error: ${err.message}`;
-                submitBtn.disabled = false;
-                progressBar.style.backgroundColor = "#e74c3c";
-                setTimeout(() => {
-                    uploadStatus.style.display = "none";
-                    progressBar.style.width = "0%";
-                    progressBar.style.backgroundColor = "#4CAF50";
-                }, 4000);
+                statusText.textContent = `Subiendo archivo ${uploaded + 1} de ${totalFiles}...`;
+
+                const formData = new FormData();
+                formData.append("file", fileToUpload);
+
+                await uploadWithRetry(formData);
+
+                uploaded++;
+                const percent = Math.round((uploaded / totalFiles) * 100);
+                progressBar.style.width = percent + "%";
             }
-        });
+        }
+
+        progressBar.style.width = "100%";
+        statusText.textContent = "¡Archivos subidos con éxito! 🎉";
+
+        setTimeout(() => {
+            window.location.href = "/";
+        }, 1200);
+
+    } catch (err) {
+        console.error(err);
+        statusText.textContent = "Error al subir archivos";
+        submitBtn.disabled = false;
+        progressBar.style.width = "0%";
+        setTimeout(() => {
+            uploadStatus.style.display = "none";
+        }, 3000);
+    }
+});
 </script>
 </body>
 </html>
