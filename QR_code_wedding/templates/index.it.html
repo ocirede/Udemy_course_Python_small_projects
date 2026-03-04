@@ -91,100 +91,159 @@ const compressionOptions = {
     initialQuality: 0.85
 };
 
-/* Aggiorna il conteggio dei file selezionati */
+/* Update selected file count */
 input.addEventListener("change", function () {
+
     const count = this.files.length;
+
     if (count > 0) {
         labelText.textContent = count === 1
-            ? `${count} file selezionato`
-            : `${count} file selezionati`;
+            ? `${count} archivo seleccionado`
+            : `${count} archivos seleccionados`;
     } else {
-        labelText.textContent = "Scegli foto o video";
+        labelText.textContent = "Elegir fotos o videos";
     }
+
 });
 
-/* Funzione per upload con retry automatico */
+/* Retry upload if connection fails */
 async function uploadWithRetry(formData, retries = 3) {
+
     for (let attempt = 1; attempt <= retries; attempt++) {
+
         try {
+
             const response = await fetch("/upload", {
                 method: "POST",
                 body: formData
             });
-            if (!response.ok) throw new Error("Upload fallito");
+
+            if (!response.ok) throw new Error("Upload failed");
+
             return response;
+
         } catch (err) {
+
             if (attempt === retries) throw err;
-            console.log(`Retry ${attempt}...`);
+
+            console.log("Retry upload...");
+
             await new Promise(resolve => setTimeout(resolve, 1500));
         }
+
     }
+
 }
 
-/* Divide array in batch */
-function chunkArray(array, chunkSize) {
-    const chunks = [];
-    for (let i = 0; i < array.length; i += chunkSize) {
-        chunks.push(array.slice(i, i + chunkSize));
+/* Split files into batches */
+function chunkArray(array, size) {
+
+    const result = [];
+
+    for (let i = 0; i < array.length; i += size) {
+        result.push(array.slice(i, i + size));
     }
-    return chunks;
+
+    return result;
 }
 
 form.addEventListener("submit", async function(e) {
+
     e.preventDefault();
 
     const files = Array.from(input.files);
+
     if (files.length === 0) return;
 
     submitBtn.disabled = true;
-    uploadStatus.style.display = "block";
-    progressBar.style.width = "0%";
 
-    // Per iPhone, batch di 5 file
+    uploadStatus.style.display = "block";
+
+    progressBar.style.width = "2%";
+    progressBar.style.backgroundColor = "#4CAF50";
+
     const batchSize = isIOS ? 5 : 20;
     const batches = chunkArray(files, batchSize);
 
     try {
-        let totalUploaded = 0;
+
+        let uploaded = 0;
         const totalFiles = files.length;
 
         for (const batch of batches) {
+
             for (const file of batch) {
 
                 let fileToUpload = file;
 
-                if (file.type.startsWith("image/") && !isIOS) {
-                    statusText.textContent = "Compressione immagine...";
-                    fileToUpload = await imageCompression(file, compressionOptions);
-                } else if (file.type.startsWith("image/") && isIOS) {
-                    statusText.textContent = "Preparazione immagine...";
-                } else if (file.type.startsWith("video/")) {
-                    statusText.textContent = "Preparazione video...";
+                /* IMAGE */
+                if (file.type.startsWith("image/")) {
+
+                    if (!isIOS) {
+
+                        statusText.textContent = "Comprimiendo imagen...";
+
+                        fileToUpload = await imageCompression(file, compressionOptions);
+
+                    } else {
+
+                        statusText.textContent = "Preparando imagen...";
+
+                    }
+
                 }
 
-                statusText.textContent = "Caricamento in corso...";
+                /* VIDEO */
+                else if (file.type && file.type.startsWith("video")) {
+
+                    statusText.textContent = "Preparando video...";
+
+                    fileToUpload = file;
+
+                }
+
+                statusText.textContent = "Subiendo archivo...";
 
                 const formData = new FormData();
+
                 formData.append("file", fileToUpload);
 
                 await uploadWithRetry(formData);
 
-                totalUploaded++;
-                const percent = Math.round((totalUploaded / totalFiles) * 100);
+                uploaded++;
+
+                const percent = Math.round((uploaded / totalFiles) * 100);
+
                 progressBar.style.width = percent + "%";
+
             }
+
         }
 
-        statusText.textContent = "Caricamento completato con successo! 🎉";
-        setTimeout(() => { window.location.href = "/"; }, 1200);
+        progressBar.style.width = "100%";
+
+        statusText.textContent = "¡Archivos subidos con éxito! 🎉";
+
+        setTimeout(() => {
+            window.location.href = "/";
+        }, 1200);
 
     } catch (err) {
+
         console.error(err);
-        statusText.textContent = "Errore durante il caricamento";
+
+        statusText.textContent = "Error al subir archivos";
+
         submitBtn.disabled = false;
+
         progressBar.style.width = "0%";
-        setTimeout(() => { uploadStatus.style.display = "none"; }, 3000);
+
+        setTimeout(() => {
+            uploadStatus.style.display = "none";
+        }, 3000);
+
     }
+
 });
 </script>
 </body>
