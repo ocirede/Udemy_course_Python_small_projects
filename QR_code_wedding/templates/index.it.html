@@ -163,13 +163,32 @@ form.addEventListener("submit", async function(e) {
             for (const file of batch) {
                 let fileToUpload = file;
 
-                /* IMMAGINE */
-                if (file.type.startsWith("image/")) {
-                    if (!isIOS) {
-                        statusText.textContent = "Compressione immagine...";
-                        fileToUpload = await imageCompression(file, compressionOptions);
-                    } else {
-                        statusText.textContent = "Preparazione immagine...";
+                    /* IMAGE */
+                if (file.type.startsWith("image/") || file.name.match(/\.(heic|heif)$/i)) {
+                    statusText.textContent = "Preparando immagine...";
+
+                    // Convert HEIC/HEIF to JPEG first
+                    if (file.type === "image/heic" || file.type === "image/heif" || file.name.match(/\.(heic|heif)$/i)) {
+                        statusText.textContent = "Convertendo imaggine...";
+                        try {
+                            const convertedBlob = await heic2any({
+                                blob: file,
+                                toType: "image/jpeg",
+                                quality: 0.85
+                            });
+                            fileToUpload = new File([convertedBlob], file.name.replace(/\.(heic|heif)$/i, ".jpg"), { type: "image/jpeg" });
+                        } catch (e) {
+                            console.warn("HEIC conversion failed, uploading original:", e);
+                            fileToUpload = file;
+                        }
+                    }
+
+                    // Compress
+                    try {
+                        statusText.textContent = "Comprimiendo imagen...";
+                        fileToUpload = await imageCompression(fileToUpload, compressionOptions);
+                    } catch (e) {
+                        console.warn("Compression failed, uploading original:", e);
                     }
                 }
 
