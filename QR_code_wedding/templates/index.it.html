@@ -2,75 +2,77 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Album di matrimonio di Angelica e Matteo</title>
+    <title>Album di nozze di Angélica e Matteo</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" href="/static/images/AM.jpg" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- ADD THIS: Compression library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.js"></script>
 </head>
 <body>
-   <div class="container">
-    <div class="overlay">
-        <h1>Angélica e Matteo</h1>
-        <div class="title_overlay">
-            <h2 id="title">Benvenuti all'album fotografico di gruppo</h2>
-        </div>
-
-        <p class="paragraphs_main_page">
-            Carica tutte le tue foto e i tuoi video per aiutarci a conservare ancora più ricordi di questo giorno così speciale.
-        </p>
-
-        <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
-
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    Premi questo pulsante per scegliere i tuoi file
-                </p>
-                <i class="arrow fa-solid fa-arrow-right"></i>
-                <label class="file-button">
-                    <span id="file-label-text">Scegli foto o video</span>
-                    <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
-                </label>
+  <div class="container">
+        <div class="overlay">
+            <h1>Angélica e Matteo</h1>
+            <div class="title_overlay">
+                <h2 id="title">Benvenuti nell'album fotografico di gruppo</h2>
             </div>
 
-            <div class="step">
-                <p class="paragraphs_main_page">
-                    Poi premi questo pulsante per caricarli.
-                </p>
-                <i class="arrow fa-solid fa-arrow-right"></i>
-                <button type="submit" id="submit-btn">Carica foto o video</button>
-            </div>
+            <p class="paragraphs_main_page">
+                Carica tutte le tue foto e video per aiutarci ad avere ancora più ricordi di questo giorno così speciale.
+            </p>
 
-            <!-- Indicatore di caricamento -->
-            <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
-                <p id="status-text">Preparazione in corso...</p>
-                <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
-                    <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
+            <form method="POST" action="/upload" enctype="multipart/form-data" id="upload-form">
+
+                <div class="step">
+                    <p class="paragraphs_main_page">
+                        Premi questo pulsante per scegliere i tuoi file
+                    </p>
+                    <i class="arrow fa-solid fa-arrow-right"></i>
+                    <label class="file-button">
+                        <span id="file-label-text">Scegli foto o video</span>
+                        <input type="file" name="file" accept="image/*, video/*" multiple required id="file-input">
+                    </label>
                 </div>
+
+                <div class="step">
+                    <p class="paragraphs_main_page">
+                        Poi premi questo pulsante per caricarli.
+                    </p>
+                    <i class="arrow fa-solid fa-arrow-right"></i>
+                    <button type="submit" id="submit-btn">Carica foto o video</button>
+                </div>
+
+                <!-- Indicatore di caricamento -->
+                <div id="upload-status" style="display: none; text-align: center; margin-top: 20px;">
+                    <p id="status-text">Preparazione...</p>
+                    <div style="background: #ddd; height: 20px; border-radius: 10px; overflow: hidden;">
+                        <div id="progress-bar" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+
+                <!-- Messaggio di errore -->
+                <div id="file-error" style="display:none; text-align:center; margin-top:15px; color:#c0392b; font-size:14px; padding: 10px; background: #fde8e8; border-radius: 8px;"></div>
+
+            </form>
+
+            {% if photos %}
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    Fatto! Se vuoi vedere le foto e i video, puoi cliccare su questo link:
+                </p>
+                <h3><a href="{{ url_for('gallery') }}">GALLERIA</a></h3>
             </div>
+            {% endif %}
 
-        </form>
-
-        {% if photos %}
-        <div class="step">
-            <p class="paragraphs_main_page">
-                Fatto! Se vuoi vedere le foto e i video, puoi cliccare su questo link:
-            </p>
-            <h3><a href="{{ url_for('gallery') }}">GALLERIA</a></h3>
-        </div>
-        {% endif %}
-
-        <div class="step">
-            <p class="paragraphs_main_page">
-                Para español, haz clic:
-            </p>
-            <h4><a href="{{ url_for('index') }}">AQUÍ</a></h4>
+            <div class="step">
+                <p class="paragraphs_main_page">
+                    Per lo spagnolo, clicca:
+                </p>
+                <h4><a href="{{ url_for('index') }}">QUI</a></h4>
+            </div>
         </div>
     </div>
-</div>
 <script>
 const input = document.getElementById("file-input");
 const labelText = document.getElementById("file-label-text");
@@ -79,6 +81,7 @@ const submitBtn = document.getElementById("submit-btn");
 const uploadStatus = document.getElementById("upload-status");
 const statusText = document.getElementById("status-text");
 const progressBar = document.getElementById("progress-bar");
+const errDiv = document.getElementById("file-error");
 
 const isIOS =
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -91,87 +94,61 @@ const compressionOptions = {
     initialQuality: 0.85
 };
 
-/* Update selected file count */
 input.addEventListener("change", function () {
-
     const count = this.files.length;
-
     if (count > 0) {
         labelText.textContent = count === 1
-            ? `${count} archivo seleccionado`
-            : `${count} archivos seleccionados`;
+            ? `${count} file selezionato`
+            : `${count} file selezionati`;
     } else {
-        labelText.textContent = "Elegir fotos o videos";
+        labelText.textContent = "Scegli foto o video";
     }
-
 });
 
-/* Upload using XMLHttpRequest (better for mobile videos) */
 async function uploadWithRetry(formData, retries = 3) {
-
     for (let attempt = 1; attempt <= retries; attempt++) {
-
         try {
-
             await new Promise((resolve, reject) => {
-
                 const xhr = new XMLHttpRequest();
-
                 xhr.open("POST", "/upload", true);
-
                 xhr.onload = function () {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve();
                     } else {
-                        reject(new Error("Upload failed"));
+                        reject(new Error("Caricamento fallito"));
                     }
                 };
-
-                xhr.onerror = () => reject(new Error("Network error"));
-
+                xhr.onerror = () => reject(new Error("Errore di rete"));
                 xhr.send(formData);
-
             });
-
             return;
-
         } catch (err) {
-
             if (attempt === retries) throw err;
-
-            console.log("Retry upload...");
+            console.log("Nuovo tentativo...");
             await new Promise(r => setTimeout(r, 1500));
-
         }
-
     }
-
 }
 
-/* Split files into batches (important for mobile stability) */
 function chunkArray(array, size) {
-
     const result = [];
-
     for (let i = 0; i < array.length; i += size) {
         result.push(array.slice(i, i + size));
     }
-
     return result;
 }
 
 form.addEventListener("submit", async function(e) {
-
     e.preventDefault();
 
-    const files = Array.from(input.files);
+    errDiv.style.display = "none";
+    errDiv.textContent = "";
 
+    const files = Array.from(input.files);
     if (files.length === 0) return;
 
     submitBtn.disabled = true;
-
     uploadStatus.style.display = "block";
-
     progressBar.style.width = "2%";
     progressBar.style.backgroundColor = "#4CAF50";
 
@@ -179,31 +156,21 @@ form.addEventListener("submit", async function(e) {
     const batches = chunkArray(files, batchSize);
 
     try {
-
         let uploaded = 0;
         const totalFiles = files.length;
 
         for (const batch of batches) {
-
             for (const file of batch) {
-
                 let fileToUpload = file;
 
-                /* IMAGE */
+                /* IMMAGINE */
                 if (file.type.startsWith("image/")) {
-
                     if (!isIOS) {
-
-                        statusText.textContent = "Comprimiendo imagen...";
-
+                        statusText.textContent = "Compressione immagine...";
                         fileToUpload = await imageCompression(file, compressionOptions);
-
                     } else {
-
-                        statusText.textContent = "Preparando imagen...";
-
+                        statusText.textContent = "Preparazione immagine...";
                     }
-
                 }
 
                 /* VIDEO */
@@ -212,7 +179,8 @@ form.addEventListener("submit", async function(e) {
                     file.name.match(/\.(mp4|mov|m4v)$/i)
                 ) {
                     if (file.size > 100 * 1024 * 1024) {
-                        alert(`❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`);
+                        errDiv.textContent = `❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`;
+                        errDiv.style.display = "block";
                         uploaded++;
                         const percent = Math.round((uploaded / totalFiles) * 100);
                         progressBar.style.width = percent + "%";
@@ -221,7 +189,8 @@ form.addEventListener("submit", async function(e) {
                     statusText.textContent = "Preparazione video...";
                     fileToUpload = file;
                 }
-                statusText.textContent = `Subiendo archivo ${uploaded + 1} de ${totalFiles}...`;
+
+                statusText.textContent = `Caricamento file ${uploaded + 1} di ${totalFiles}...`;
 
                 const formData = new FormData();
                 formData.append("file", fileToUpload);
@@ -229,39 +198,27 @@ form.addEventListener("submit", async function(e) {
                 await uploadWithRetry(formData);
 
                 uploaded++;
-
                 const percent = Math.round((uploaded / totalFiles) * 100);
-
                 progressBar.style.width = percent + "%";
-
             }
-
         }
 
         progressBar.style.width = "100%";
-
-        statusText.textContent = "¡Archivos subidos con éxito! 🎉";
+        statusText.textContent = "File caricati con successo! 🎉";
 
         setTimeout(() => {
             window.location.href = "/";
         }, 1200);
 
     } catch (err) {
-
         console.error(err);
-
-        statusText.textContent = "Error al subir archivos";
-
+        statusText.textContent = "Errore durante il caricamento";
         submitBtn.disabled = false;
-
         progressBar.style.width = "0%";
-
         setTimeout(() => {
             uploadStatus.style.display = "none";
         }, 3000);
-
     }
-
 });
 </script>
 </body>

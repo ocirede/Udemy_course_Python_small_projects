@@ -51,6 +51,9 @@
                     </div>
                 </div>
 
+                <!-- Error message -->
+                <div id="file-error" style="display:none; text-align:center; margin-top:15px; color:#c0392b; font-size:14px; padding: 10px; background: #fde8e8; border-radius: 8px;"></div>
+
             </form>
 
             {% if photos %}
@@ -78,6 +81,7 @@ const submitBtn = document.getElementById("submit-btn");
 const uploadStatus = document.getElementById("upload-status");
 const statusText = document.getElementById("status-text");
 const progressBar = document.getElementById("progress-bar");
+const errDiv = document.getElementById("file-error");
 
 const isIOS =
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -137,6 +141,9 @@ function chunkArray(array, size) {
 form.addEventListener("submit", async function(e) {
     e.preventDefault();
 
+    errDiv.style.display = "none";
+    errDiv.textContent = "";
+
     const files = Array.from(input.files);
     if (files.length === 0) return;
 
@@ -172,17 +179,18 @@ form.addEventListener("submit", async function(e) {
                     file.name.match(/\.(mp4|mov|m4v)$/i)
                 ) {
                     if (file.size > 100 * 1024 * 1024) {
-                        alert(`❌ "${file.name}" es demasiado grande (${(file.size / 1024 / 1024).toFixed(0)}MB). El límite es 100MB. Por favor recorta o comprime el video antes de subirlo.`);
+                        errDiv.textContent = `❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`;
+                        errDiv.style.display = "block";
                         uploaded++;
                         const percent = Math.round((uploaded / totalFiles) * 100);
                         progressBar.style.width = percent + "%";
                         continue;
                     }
-                    statusText.textContent = "Preparando video...";
+                    statusText.textContent = "Preparazione video...";
                     fileToUpload = file;
                 }
 
-                statusText.textContent = `Subiendo archivo ${uploaded + 1} de ${totalFiles}...`;
+                statusText.textContent = `Caricando file ${uploaded + 1} di ${totalFiles}...`;
 
                 const formData = new FormData();
                 formData.append("file", fileToUpload);
