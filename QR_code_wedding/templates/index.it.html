@@ -9,6 +9,7 @@
     <link rel="icon" href="/static/images/AM.jpg" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.2/browser-image-compression.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -169,7 +170,7 @@ form.addEventListener("submit", async function(e) {
 
                     // Convert HEIC/HEIF to JPEG first
                     if (file.type === "image/heic" || file.type === "image/heif" || file.name.match(/\.(heic|heif)$/i)) {
-                        statusText.textContent = "Convertendo imaggine...";
+                        statusText.textContent = "Convertendo immagine...";
                         try {
                             const convertedBlob = await heic2any({
                                 blob: file,
