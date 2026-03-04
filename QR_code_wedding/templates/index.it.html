@@ -67,7 +67,7 @@
 
             <div class="step">
                 <p class="paragraphs_main_page">
-                    Per lo spagnolo, clicca:
+                    Para el español, haz clic:
                 </p>
                 <h4><a href="{{ url_for('index') }}">QUI</a></h4>
             </div>
@@ -181,7 +181,7 @@ form.addEventListener("submit", async function(e) {
                     if (file.size > 100 * 1024 * 1024) {
                         errDiv.textContent = `❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`;
                         errDiv.style.display = "block";
-                     setTimeout(() => {
+                        setTimeout(() => {
                         errDiv.style.display = "none";
                         errDiv.textContent = "";
                         uploadStatus.style.display = "none";
@@ -210,13 +210,13 @@ form.addEventListener("submit", async function(e) {
             }
         }
         if (uploaded > 0) {
-        progressBar.style.width = "100%";
-        statusText.textContent = "File caricati con successo! 🎉";
+            progressBar.style.width = "100%";
+            statusText.textContent = "File caricati con successo! 🎉";
 
-        setTimeout(() => {
-            window.location.href = "/";
-        }, 1200)
-        } else {
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 1200)
+            } else {
             uploadStatus.style.display = "none";
             submitBtn.disabled = false;
         }
