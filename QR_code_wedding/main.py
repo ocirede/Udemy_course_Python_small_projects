@@ -42,8 +42,12 @@ def index():
     return render_template("index.html", photos=urls, language=language)
 
 @app.route("/upload", methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload():
     files = request.files.getlist("file")
+
+    if not files:
+        return jsonify({'error': 'No files uploaded'}), 400
 
     for file in files:
         if file.filename == "":
@@ -54,26 +58,31 @@ def upload():
 
             # VIDEO
             if mimetype.startswith("video"):
+                print(f"Uploading video: {file.filename}, size={file.content_length}")
                 cloudinary.uploader.upload_large(
-                    file.stream,          # ✅ FIX
+                    file.stream,
                     resource_type="video",
                     folder="wedding-photos",
-                    chunk_size=6000000
+                    chunk_size=6_000_000,  # 6MB chunks
+                    timeout=600,           # optional timeout in seconds
+                    secure=True
                 )
 
             # IMAGE
             else:
+                print(f"Uploading image: {file.filename}, size={file.content_length}")
                 cloudinary.uploader.upload(
-                    file.stream,          # ✅ FIX
+                    file.stream,
                     resource_type="image",
-                    folder="wedding-photos"
+                    folder="wedding-photos",
+                    secure=True
                 )
 
         except Exception as e:
-            print("Upload error:", e)
+            print(f"Upload error for {file.filename}: {e}")
             return jsonify({'error': str(e)}), 500
 
-    return '', 204
+    return jsonify({'success': True}), 200
 
 @app.route("/gallery", methods=["GET"])
 def gallery():
