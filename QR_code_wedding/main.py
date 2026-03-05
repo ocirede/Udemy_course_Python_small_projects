@@ -184,8 +184,14 @@ def gallery():
             if not next_vid_cursor:
                 break
 
-        # Sort everything by date, newest first
-        items.sort(key=lambda x: x["created_at"], reverse=True)
+        # Videos first (newest first), then images (newest first)
+        videos = [i for i in items if i["type"] == "video"]
+        images = [i for i in items if i["type"] == "image"]
+
+        videos.sort(key=lambda x: x["created_at"], reverse=True)
+        images.sort(key=lambda x: x["created_at"], reverse=True)
+
+        items = videos + images
 
     # ---------- AJAX ----------
     if request.args.get("ajax"):
