@@ -225,6 +225,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let touchStartY = 0;
 
         wrapper.addEventListener("touchstart", e => {
+            e.preventDefault();
             isLongPress = false;
             touchMoved = false;
             touchStartX = e.touches[0].clientX;
@@ -236,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 wrapper.classList.toggle("selected");
                 const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
                 downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
-            }, 350);
+            }, 400);
         });
 
         wrapper.addEventListener("touchmove", e => {
