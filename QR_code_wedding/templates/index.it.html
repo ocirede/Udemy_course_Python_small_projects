@@ -147,6 +147,12 @@ form.addEventListener("submit", async function(e) {
     const files = Array.from(input.files);
     if (files.length === 0) return;
 
+    if (files.length > 50) {
+    errDiv.textContent = "⚠️ Per favore carica massimo 50 file alla volta.";
+    errDiv.style.display = "block";
+    return;
+    }
+
     submitBtn.disabled = true;
     uploadStatus.style.display = "block";
     progressBar.style.width = "2%";
@@ -159,12 +165,14 @@ form.addEventListener("submit", async function(e) {
         let uploaded = 0;
         const totalFiles = files.length;
 
+
         for (const batch of batches) {
             for (const file of batch) {
                 let fileToUpload = file;
+                const isImage = file.type.startsWith("image/") || file.name.match(/\.(jpg|jpeg|png|heic|heif)$/i);
 
                     /* IMAGE */
-                if (file.type.startsWith("image/") || file.name.match(/\.(heic|heif)$/i)) {
+                if (isImage) {
                     statusText.textContent = "Preparando immagine...";
 
                     // Convert HEIC/HEIF to JPEG first

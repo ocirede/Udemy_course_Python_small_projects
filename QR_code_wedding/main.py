@@ -100,6 +100,7 @@ def upload():
             return jsonify({'error': str(e)}), 500
 
     return jsonify({'success': True}), 200
+
 @app.route("/gallery", methods=["GET"])
 def gallery():
     language = session.get("language")
