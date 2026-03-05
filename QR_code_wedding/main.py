@@ -23,6 +23,12 @@ app = Flask(__name__)
 app.secret_key = SESSION_KEY
 app.config['MAX_CONTENT_LENGTH'] = 600 * 1024 * 1024
 
+MAX_VIDEO = 100 * 1024 * 1024
+MAX_IMAGE = 20 * 1024 * 1024
+
+ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'}
+ALLOWED_VIDEO_TYPES = {'video/mp4', 'video/quicktime', 'video/x-m4v'}
+ALLOWED_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.heic', '.heif', '.mp4', '.mov', '.m4v'}
 
 cloudinary.config(
     cloud_name=CLOUDINARY_NAME,
@@ -52,16 +58,32 @@ def upload():
     if not files:
         return jsonify({'error': 'No files uploaded'}), 400
 
+    if len(files) > MAX_FILES:
+        return jsonify({'error': f'Too many files. Maximum is {MAX_FILES}.'}), 400
+
     for file in files:
         if file.filename == "":
             continue
 
         try:
             mimetype = file.mimetype or ""
+            ext = os.path.splitext(file.filename.lower())[1]
+
+            # Validate file type
+            if mimetype not in ALLOWED_IMAGE_TYPES and mimetype not in ALLOWED_VIDEO_TYPES \
+               and ext not in ALLOWED_EXTENSIONS:
+                return jsonify({'error': f'Unsupported file type: {file.filename}'}), 400
+
+            # Get file size
+            file.seek(0, 2)
+            size = file.tell()
+            file.seek(0)
 
             # VIDEO
-            if mimetype.startswith("video"):
-                print(f"Uploading video: {file.filename}, size={file.content_length}")
+            if mimetype.startswith("video") or ext in {'.mp4', '.mov', '.m4v'}:
+                if size > MAX_VIDEO:
+                    return jsonify({'error': f'{file.filename} is too large. Maximum is 100MB.'}), 400
+                print(f"Uploading video: {file.filename}, size={size}")
                 cloudinary.uploader.upload_large(
                     file.stream,
                     resource_type="video",
@@ -72,7 +94,7 @@ def upload():
                 )
 
             # HEIC/HEIF — convert to JPEG first
-            elif file.filename.lower().endswith(('.heic', '.heif')) or mimetype in ('image/heic', 'image/heif'):
+            elif ext in {'.heic', '.heif'} or mimetype in {'image/heic', 'image/heif'}:
                 print(f"Converting HEIC image: {file.filename}")
                 img = Image.open(file.stream)
                 output = io.BytesIO()
@@ -87,7 +109,7 @@ def upload():
 
             # IMAGE
             else:
-                print(f"Uploading image: {file.filename}, size={file.content_length}")
+                print(f"Uploading image: {file.filename}, size={size}")
                 cloudinary.uploader.upload(
                     file.stream,
                     resource_type="image",

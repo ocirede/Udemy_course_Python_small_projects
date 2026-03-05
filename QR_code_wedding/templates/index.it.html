@@ -115,7 +115,12 @@ async function uploadWithRetry(formData, retries = 3) {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         resolve();
                     } else {
-                        reject(new Error("Caricamento fallito"));
+                        try {
+                            const err = JSON.parse(xhr.responseText);
+                            reject(new Error(err.error || "Errore durante il caricamento"));
+                        } catch {
+                            reject(new Error("Errore durante il caricamento"));
+                        }
                     }
                 };
                 xhr.onerror = () => reject(new Error("Errore di rete"));
@@ -148,9 +153,9 @@ form.addEventListener("submit", async function(e) {
     if (files.length === 0) return;
 
     if (files.length > 50) {
-    errDiv.textContent = "⚠️ Per favore carica massimo 50 file alla volta.";
-    errDiv.style.display = "block";
-    return;
+        errDiv.textContent = "⚠️ Per favore, carica un massimo di 50 file alla volta.";
+        errDiv.style.display = "block";
+        return;
     }
 
     submitBtn.disabled = true;
@@ -165,43 +170,28 @@ form.addEventListener("submit", async function(e) {
         let uploaded = 0;
         const totalFiles = files.length;
 
-
         for (const batch of batches) {
             for (const file of batch) {
                 let fileToUpload = file;
                 const isImage = file.type.startsWith("image/") || file.name.match(/\.(jpg|jpeg|png|heic|heif)$/i);
 
-                    /* IMAGE */
+                /* IMMAGINE */
                 if (isImage) {
-                    statusText.textContent = "Preparando immagine...";
-
-                    // Convert HEIC/HEIF to JPEG first
-                    if (file.type === "image/heic" || file.type === "image/heif" || file.name.match(/\.(heic|heif)$/i)) {
-                        statusText.textContent = "Convertendo immagine...";
+                    if (!isIOS && !file.name.match(/\.(heic|heif)$/i)) {
+                        statusText.textContent = "Compressione immagine...";
                         try {
-                            const convertedBlob = await heic2any({
-                                blob: file,
-                                toType: "image/jpeg",
-                                quality: 0.85
-                            });
-                            fileToUpload = new File([convertedBlob], file.name.replace(/\.(heic|heif)$/i, ".jpg"), { type: "image/jpeg" });
+                            fileToUpload = await imageCompression(file, compressionOptions);
                         } catch (e) {
-                            console.warn("HEIC conversion failed, uploading original:", e);
+                            console.warn("Compressione fallita, caricamento originale:", e);
                             fileToUpload = file;
                         }
-                    }
-
-                    // Compress
-                    try {
-                        statusText.textContent = "Comprimiendo imagen...";
-                        fileToUpload = await imageCompression(fileToUpload, compressionOptions);
-                    } catch (e) {
-                        console.warn("Compression failed, uploading original:", e);
+                    } else {
+                        statusText.textContent = "Preparazione immagine...";
                     }
                 }
 
                 /* VIDEO */
-               else if (
+                else if (
                     file.type.startsWith("video") ||
                     file.name.match(/\.(mp4|mov|m4v)$/i)
                 ) {
@@ -217,6 +207,7 @@ form.addEventListener("submit", async function(e) {
                             labelText.textContent = "Scegli foto o video";
                             submitBtn.disabled = false;
                         }, 5000);
+                        continue;
                     }
                     statusText.textContent = "Preparazione video...";
                     fileToUpload = file;
@@ -234,26 +225,30 @@ form.addEventListener("submit", async function(e) {
                 progressBar.style.width = percent + "%";
             }
         }
+
         if (uploaded > 0) {
             progressBar.style.width = "100%";
             statusText.textContent = "File caricati con successo! 🎉";
-
             setTimeout(() => {
                 window.location.href = "/";
-            }, 1200)
-            } else {
+            }, 1200);
+        } else {
             uploadStatus.style.display = "none";
             submitBtn.disabled = false;
         }
 
     } catch (err) {
         console.error(err);
+        errDiv.textContent = `❌ ${err.message}`;
+        errDiv.style.display = "block";
         statusText.textContent = "Errore durante il caricamento";
         submitBtn.disabled = false;
         progressBar.style.width = "0%";
         setTimeout(() => {
             uploadStatus.style.display = "none";
-        }, 3000);
+            errDiv.style.display = "none";
+            errDiv.textContent = "";
+        }, 5000);
     }
 });
 </script>
