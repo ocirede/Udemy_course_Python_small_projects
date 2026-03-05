@@ -215,63 +215,63 @@ document.addEventListener("DOMContentLoaded", () => {
     // GALLERY CLICK & SELECTION
     // ======================
    function bindGalleryItem(wrapper) {
-    const img = wrapper.querySelector("img");
-    if (!img) return; // skip videos
+        const img = wrapper.querySelector("img");
+        if (!img) return; // skip videos
 
-    let longPressTimer = null;
-    let isLongPress = false;
-    let touchMoved = false;
-    let touchStartX = 0;
-    let touchStartY = 0;
+        let longPressTimer = null;
+        let isLongPress = false;
+        let touchMoved = false;
+        let touchStartX = 0;
+        let touchStartY = 0;
 
-    wrapper.addEventListener("touchstart", e => {
-        isLongPress = false;
-        touchMoved = false;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
+        wrapper.addEventListener("touchstart", e => {
+            isLongPress = false;
+            touchMoved = false;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
 
-        longPressTimer = setTimeout(() => {
-            if (touchMoved) return;
-            isLongPress = true;
-            wrapper.classList.toggle("selected");
-            const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
-            downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
-        }, 500);
-    });
+            longPressTimer = setTimeout(() => {
+                if (touchMoved) return;
+                isLongPress = true;
+                wrapper.classList.toggle("selected");
+                const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
+                downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
+            }, 350);
+        });
 
-    wrapper.addEventListener("touchmove", e => {
-        const dx = Math.abs(e.touches[0].clientX - touchStartX);
-        const dy = Math.abs(e.touches[0].clientY - touchStartY);
-        if (dx > 10 || dy > 10) {
-            touchMoved = true;
+        wrapper.addEventListener("touchmove", e => {
+            const dx = Math.abs(e.touches[0].clientX - touchStartX);
+            const dy = Math.abs(e.touches[0].clientY - touchStartY);
+            if (dx > 10 || dy > 10) {
+                touchMoved = true;
+                clearTimeout(longPressTimer);
+            }
+        });
+
+        wrapper.addEventListener("touchend", e => {
             clearTimeout(longPressTimer);
-        }
-    });
+            if (isLongPress || touchMoved) return;
 
-    wrapper.addEventListener("touchend", e => {
-        clearTimeout(longPressTimer);
-        if (isLongPress || touchMoved) return;
+            refreshImages();
+            currentIndex = images.indexOf(img.dataset.full);
+            showModalImage();
+            lightbox.classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+            downloadMultipleBtn.style.display = "none";
+        });
 
-        refreshImages();
-        currentIndex = images.indexOf(img.dataset.full);
-        showModalImage();
-        lightbox.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-        downloadMultipleBtn.style.display = "none";
-    });
+        // Desktop fallback
+        wrapper.addEventListener("click", e => {
+            if (e.pointerType === "touch") return; // already handled by touch events
+            refreshImages();
+            currentIndex = images.indexOf(img.dataset.full);
+            showModalImage();
+            lightbox.classList.remove("hidden");
+            document.body.style.overflow = "hidden";
+        });
+    }
 
-    // Desktop fallback
-    wrapper.addEventListener("click", e => {
-        if (e.pointerType === "touch") return; // already handled by touch events
-        refreshImages();
-        currentIndex = images.indexOf(img.dataset.full);
-        showModalImage();
-        lightbox.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-    });
-}
-
-    document.querySelectorAll(".gallery-item").forEach(bindGalleryItem);
+   document.querySelectorAll(".gallery-item").forEach(bindGalleryItem);
 
     // ======================
     // MULTIPLE DOWNLOAD
