@@ -159,12 +159,36 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================
     let touchStartX = 0;
     let touchEndX = 0;
-    lightbox.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; });
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let isPinching = false;
+
+    lightbox.addEventListener("touchstart", e => {
+        if (e.touches.length > 1) {
+            isPinching = true;
+            return;
+        }
+        isPinching = false;
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    });
+
     lightbox.addEventListener("touchend", e => {
+        if (isPinching) {
+            isPinching = false;
+            return;
+        }
         touchEndX = e.changedTouches[0].screenX;
-        const delta = touchStartX - touchEndX;
-        if(Math.abs(delta) > 50){
-            if(delta > 0){
+        touchEndY = e.changedTouches[0].screenY;
+
+        const deltaX = touchStartX - touchEndX;
+        const deltaY = Math.abs(touchStartY - touchEndY);
+
+        // Ignore if more vertical than horizontal (scrolling)
+        if (deltaY > Math.abs(deltaX)) return;
+
+        if (Math.abs(deltaX) > 50) {
+            if (deltaX > 0) {
                 currentIndex = (currentIndex + 1) % images.length;
             } else {
                 currentIndex = (currentIndex - 1 + images.length) % images.length;
