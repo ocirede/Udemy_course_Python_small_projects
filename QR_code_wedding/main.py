@@ -24,7 +24,7 @@ app.secret_key = SESSION_KEY
 app.config['MAX_CONTENT_LENGTH'] = 600 * 1024 * 1024
 
 MAX_VIDEO = 100 * 1024 * 1024
-MAX_IMAGE = 20 * 1024 * 1024
+MAX_FILES = 50
 
 ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'}
 ALLOWED_VIDEO_TYPES = {'video/mp4', 'video/quicktime', 'video/x-m4v'}
