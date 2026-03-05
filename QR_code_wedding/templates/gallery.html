@@ -214,67 +214,73 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // ======================
-    // GALLERY CLICK & SELECTION
-    // ======================
-   function bindGalleryItem(wrapper) {
-        const img = wrapper.querySelector("img");
-        if (!img) return; // skip videos
+// GALLERY CLICK & SELECTION
+// ======================
+function bindGalleryItem(wrapper) {
+    const img = wrapper.querySelector("img");
+    if (!img) return; // skip videos
 
-        let longPressTimer = null;
-        let isLongPress = false;
-        let touchMoved = false;
-        let touchStartX = 0;
-        let touchStartY = 0;
+    let touchMoved = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
-        wrapper.addEventListener("touchstart", e => {
-            isLongPress = false;
-            touchMoved = false;
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-
-            longPressTimer = setTimeout(() => {
-                if (touchMoved) return;
-                isLongPress = true;
-                wrapper.classList.toggle("selected");
-                const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
-                downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
-            }, 400);
+    // Select button
+    const selectBtn = wrapper.querySelector(".select-btn");
+    if (selectBtn) {
+        selectBtn.addEventListener("touchend", e => {
+            e.stopPropagation();
+            e.preventDefault();
+            wrapper.classList.toggle("selected");
+            const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
+            downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
         });
 
-        wrapper.addEventListener("touchmove", e => {
-            const dx = Math.abs(e.touches[0].clientX - touchStartX);
-            const dy = Math.abs(e.touches[0].clientY - touchStartY);
-            if (dx > 10 || dy > 10) {
-                touchMoved = true;
-                clearTimeout(longPressTimer);
-            }
-        });
-
-        wrapper.addEventListener("touchend", e => {
-            clearTimeout(longPressTimer);
-            if (isLongPress || touchMoved) return;
-
-            refreshImages();
-            currentIndex = images.indexOf(img.dataset.full);
-            showModalImage();
-            lightbox.classList.remove("hidden");
-            document.body.style.overflow = "hidden";
-            downloadMultipleBtn.style.display = "none";
-        });
-
-        // Desktop fallback
-        wrapper.addEventListener("click", e => {
-            if (e.pointerType === "touch") return; // already handled by touch events
-            refreshImages();
-            currentIndex = images.indexOf(img.dataset.full);
-            showModalImage();
-            lightbox.classList.remove("hidden");
-            document.body.style.overflow = "hidden";
+        // Desktop
+        selectBtn.addEventListener("click", e => {
+            e.stopPropagation();
+            wrapper.classList.toggle("selected");
+            const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
+            downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
         });
     }
 
-   document.querySelectorAll(".gallery-item").forEach(bindGalleryItem);
+    // Open lightbox on tap
+    wrapper.addEventListener("touchstart", e => {
+        touchMoved = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    });
 
+    wrapper.addEventListener("touchmove", e => {
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        if (dx > 10 || dy > 10) touchMoved = true;
+    });
+
+    wrapper.addEventListener("touchend", e => {
+        if (touchMoved) return;
+        if (e.target.closest(".select-btn")) return; // ignore select button taps
+        refreshImages();
+        currentIndex = images.indexOf(img.dataset.full);
+        showModalImage();
+        lightbox.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+        downloadMultipleBtn.style.display = "none";
+    });
+
+    // Desktop fallback
+    wrapper.addEventListener("click", e => {
+        if (e.target.closest(".select-btn")) return;
+        if (e.pointerType === "touch") return;
+        refreshImages();
+        currentIndex = images.indexOf(img.dataset.full);
+        showModalImage();
+        lightbox.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    });
+}
+
+document.querySelectorAll(".gallery-item").forEach(bindGalleryItem);
     // ======================
     // MULTIPLE DOWNLOAD
     // ======================
