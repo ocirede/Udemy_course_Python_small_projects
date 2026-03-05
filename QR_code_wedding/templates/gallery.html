@@ -307,9 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     wrapper.innerHTML = `
                         <video controls preload="metadata">
                             <source src="${item.url}" type="video/mp4">
-                        </video>
-                        <input type="checkbox" class="select-img">
-                    `;
+                        </video>`;
                 } else {
                     wrapper.className = "gallery-item image";
                     const img = document.createElement("img");
@@ -318,14 +316,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     img.dataset.full = item.url;
                     img.alt = "Wedding photo";
 
+                    const selectBtn = document.createElement("button");
+                    selectBtn.className = "select-btn";
+                    selectBtn.innerHTML = '<i class="fas fa-check"></i>';
+
                     wrapper.appendChild(img);
-                    wrapper.insertAdjacentHTML("beforeend",
-                        `<input type="checkbox" class="select-img">`
-                    );
+                    wrapper.appendChild(selectBtn);
 
                     lazyObserver.observe(img);
                 }
-
                 gallery.appendChild(wrapper);
                 bindGalleryItem(wrapper);
             });
