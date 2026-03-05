@@ -40,6 +40,7 @@ body.gallery_body {
     transform: scale(0.95);
 }
 
+
 /* VIDEO ITEMS FULL WIDTH */
 .gallery-item.video {
     grid-column: 1 / -1;

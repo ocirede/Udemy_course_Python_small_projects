@@ -27,7 +27,7 @@
 <!-- GALLERY -->
 <div class="gallery" id="gallery">
     {% for item in gallery_pics %}
-    <div class="gallery-item {% if item.type == 'video' %}video{% endif %}">
+    <div class="gallery-item {% if item.type == 'video' %}video{% else %}image{% endif %}">
 
         {% if item.type == "video" %}
             <video controls preload="metadata">
@@ -81,6 +81,50 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
     document.querySelectorAll(".gallery-item img.lazy").forEach(img => lazyObserver.observe(img));
+
+    // ======================
+    // FIX LAST ODD IMAGE
+    // ======================
+    function fixLastImage() {
+    const items = document.querySelectorAll('.gallery-item');
+
+    // Reset all images
+    document.querySelectorAll('.gallery-item.image').forEach(item => {
+        item.style.gridColumn = '';
+        item.style.paddingTop = '';
+    });
+
+    let imageCount = 0;
+    items.forEach((item, index) => {
+        if (item.classList.contains('image')) {
+            imageCount++;
+        } else if (item.classList.contains('video')) {
+            // Check if the image before this video is alone (odd count)
+            if (imageCount % 2 !== 0) {
+                // Find the last image before this video
+                let prev = item.previousElementSibling;
+                while (prev && !prev.classList.contains('image')) {
+                    prev = prev.previousElementSibling;
+                }
+                if (prev) {
+                    prev.style.gridColumn = '1 / -1';
+                    prev.style.paddingTop = '56.25%';
+                }
+            }
+            imageCount = 0; // reset count after each video
+        }
+    });
+
+    // Handle remaining images after last video
+    if (imageCount % 2 !== 0) {
+        const allImages = document.querySelectorAll('.gallery-item.image');
+        const last = allImages[allImages.length - 1];
+        last.style.gridColumn = '1 / -1';
+        last.style.paddingTop = '56.25%';
+    }
+}
+
+    fixLastImage();
 
     // ======================
     // REFRESH IMAGE ARRAY
@@ -154,26 +198,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const tapGap = now - lastTap;
             lastTap = now;
 
-           if (tapGap < 300) {
-                // Double-tap → open modal
-                wrapper.classList.remove("selected"); // Clear selection on double-tap
+            if (tapGap < 300) {
+                wrapper.classList.remove("selected");
                 refreshImages();
                 currentIndex = images.indexOf(img.dataset.full);
                 showModalImage();
                 lightbox.classList.remove("hidden");
                 document.body.style.overflow = "hidden";
                 downloadMultipleBtn.style.display = "none";
-
                 return;
             }
 
-            // Single-tap → toggle selection
             wrapper.classList.toggle("selected");
-
-            // Show/hide multiple download button
             const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
             downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
-
         });
     }
 
@@ -194,57 +232,56 @@ document.addEventListener("DOMContentLoaded", () => {
     // INFINITE SCROLL
     // ======================
     async function loadMore() {
-    if (!nextCursor || loading) return;
+        if (!nextCursor || loading) return;
 
-    loading = true;
-    loadingIndicator.style.display = "block";
+        loading = true;
+        loadingIndicator.style.display = "block";
 
-    try {
-        const res = await fetch(`/gallery?cursor=${nextCursor}&ajax=1`);
-        const data = await res.json();
+        try {
+            const res = await fetch(`/gallery?cursor=${nextCursor}&ajax=1`);
+            const data = await res.json();
 
-        data.urls.forEach(item => {
-            const wrapper = document.createElement("div");
+            data.urls.forEach(item => {
+                const wrapper = document.createElement("div");
 
-            if (item.type === "video") {
-                wrapper.className = "gallery-item video";
-                wrapper.innerHTML = `
-                    <video controls preload="metadata">
-                        <source src="${item.url}" type="video/mp4">
-                    </video>
-                    <input type="checkbox" class="select-img">
-                `;
-            } else {
-                wrapper.className = "gallery-item";
+                if (item.type === "video") {
+                    wrapper.className = "gallery-item video";
+                    wrapper.innerHTML = `
+                        <video controls preload="metadata">
+                            <source src="${item.url}" type="video/mp4">
+                        </video>
+                        <input type="checkbox" class="select-img">
+                    `;
+                } else {
+                    wrapper.className = "gallery-item image";
+                    const img = document.createElement("img");
+                    img.className = "lazy";
+                    img.dataset.src = item.url;
+                    img.dataset.full = item.url;
+                    img.alt = "Wedding photo";
 
-                const img = document.createElement("img");
-                img.className = "lazy";
-                img.dataset.src = item.url;
-                img.dataset.full = item.url;
-                img.alt = "Wedding photo";
+                    wrapper.appendChild(img);
+                    wrapper.insertAdjacentHTML("beforeend",
+                        `<input type="checkbox" class="select-img">`
+                    );
 
-                wrapper.appendChild(img);
-                wrapper.insertAdjacentHTML("beforeend",
-                    `<input type="checkbox" class="select-img">`
-                );
+                    lazyObserver.observe(img);
+                }
 
-                lazyObserver.observe(img);
-            }
+                gallery.appendChild(wrapper);
+                bindGalleryItem(wrapper);
+            });
 
-            gallery.appendChild(wrapper);
-            bindGalleryItem(wrapper);
-        });
+            nextCursor = data.next_cursor || "";
+            fixLastImage();
 
-        nextCursor = data.next_cursor || "";
+        } catch (err) {
+            console.error(err);
+        }
 
-    } catch (err) {
-        console.error(err);
+        loadingIndicator.style.display = "none";
+        loading = false;
     }
-
-    loadingIndicator.style.display = "none";
-    loading = false;
-}
-
 
     window.addEventListener("scroll", () => {
         if(window.innerHeight + window.scrollY >= document.body.offsetHeight - 200) loadMore();

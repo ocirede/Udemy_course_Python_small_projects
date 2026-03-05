@@ -136,77 +136,42 @@ def gallery():
     language = session.get("language")
     cursor = request.args.get("cursor")
 
+    result = cloudinary.Search()\
+        .expression("folder:wedding-photos")\
+        .sort_by("created_at", "desc")\
+        .max_results(20)\
+        .next_cursor(cursor)\
+        .execute()
+
     items = []
-
-    # ---------- IMAGES ----------
-    img_result = cloudinary.api.resources(
-        resource_type="image",
-        type="upload",
-        prefix="wedding-photos",
-        max_results=10,
-        sort_by=[{"created_at": "desc"}],
-        direction="desc",
-        next_cursor=cursor
-    )
-
-    for res in img_result.get("resources", []):
+    for res in result.get("resources", []):
         items.append({
             "url": res["secure_url"],
-            "type": "image",
+            "type": res["resource_type"],
             "created_at": res["created_at"]
         })
 
-    next_cursor = img_result.get("next_cursor") or ""
+    # Videos first, then images within each page
+    videos = [i for i in items if i["type"] == "video"]
+    images = [i for i in items if i["type"] == "image"]
 
-    # ---------- VIDEOS (only first load) ----------
-    if not cursor:
-        next_vid_cursor = None
+    items = videos + images
 
-        while True:
-            vid_result = cloudinary.api.resources(
-                resource_type="video",
-                type="upload",
-                prefix="wedding-photos",
-                max_results=500,
-                sort_by=[{"created_at": "desc"}],
-                direction="desc",
-                next_cursor=next_vid_cursor
-            )
+    next_cursor = result.get("next_cursor") or ""
 
-            for res in vid_result.get("resources", []):
-                items.append({
-                    "url": res["secure_url"],
-                    "type": "video",
-                    "created_at": res["created_at"]
-                })
-
-            next_vid_cursor = vid_result.get("next_cursor")
-            if not next_vid_cursor:
-                break
-
-        # Videos first (newest first), then images (newest first)
-        videos = [i for i in items if i["type"] == "video"]
-        images = [i for i in items if i["type"] == "image"]
-
-        videos.sort(key=lambda x: x["created_at"], reverse=True)
-        images.sort(key=lambda x: x["created_at"], reverse=True)
-
-        items = videos + images
-
-    # ---------- AJAX ----------
     if request.args.get("ajax"):
         return jsonify({
             "urls": items,
             "next_cursor": next_cursor
         })
 
-    # ---------- FIRST PAGE ----------
     return render_template(
         "gallery.html",
         gallery_pics=items,
         next_cursor=next_cursor,
         language=language
     )
+
 @app.route("/download")
 def download_image():
     url = request.args.get("url")
