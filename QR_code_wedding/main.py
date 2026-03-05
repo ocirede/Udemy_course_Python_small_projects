@@ -167,6 +167,8 @@ def gallery():
                 type="upload",
                 prefix="wedding-photos",
                 max_results=500,
+                sort_by=[{"created_at": "desc"}],
+                direction="desc",
                 next_cursor=next_vid_cursor
             )
 
