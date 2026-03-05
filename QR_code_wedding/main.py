@@ -10,6 +10,7 @@ from zipfile import ZipFile
 from PIL import Image
 from pillow_heif import register_heif_opener
 import io
+from werkzeug.exceptions import RequestEntityTooLarge
 
 load_dotenv()
 register_heif_opener()
@@ -36,6 +37,13 @@ cloudinary.config(
     api_secret=API_SECRET
 )
 
+@app.errorhandler(RequestEntityTooLarge)
+def handle_too_large(e):
+    if session.get("language") == "it":
+        msg = "Il file è troppo grande. Il limite totale è 600MB per invio."
+    else:
+        msg = "El archivo es demasiado grande. El límite total es 600MB por envío."
+    return jsonify({'error': msg}), 413
 
 @app.route("/", methods=["GET"])
 def index():
