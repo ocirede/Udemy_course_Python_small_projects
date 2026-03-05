@@ -148,10 +148,12 @@ def gallery():
         direction="desc",
         next_cursor=cursor
     )
+
     for res in img_result.get("resources", []):
         items.append({
             "url": res["secure_url"],
-            "type": "image"
+            "type": "image",
+            "created_at": res["created_at"]
         })
 
     next_cursor = img_result.get("next_cursor") or ""
@@ -159,7 +161,6 @@ def gallery():
     # ---------- VIDEOS (only first load) ----------
     if not cursor:
         next_vid_cursor = None
-        all_videos = []
 
         while True:
             vid_result = cloudinary.api.resources(
@@ -173,18 +174,18 @@ def gallery():
             )
 
             for res in vid_result.get("resources", []):
-                all_videos.append({
+                items.append({
                     "url": res["secure_url"],
-                    "type": "video"
+                    "type": "video",
+                    "created_at": res["created_at"]
                 })
 
             next_vid_cursor = vid_result.get("next_cursor")
             if not next_vid_cursor:
-                break  # no more videos
+                break
 
-        # Insert videos first
-        for video in reversed(all_videos):  # reverse to keep newest first
-            items.insert(0, video)
+        # Sort everything by date, newest first
+        items.sort(key=lambda x: x["created_at"], reverse=True)
 
     # ---------- AJAX ----------
     if request.args.get("ajax"):
@@ -200,7 +201,6 @@ def gallery():
         next_cursor=next_cursor,
         language=language
     )
-
 @app.route("/download")
 def download_image():
     url = request.args.get("url")
