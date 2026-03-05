@@ -216,24 +216,42 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================
    function bindGalleryItem(wrapper) {
     const img = wrapper.querySelector("img");
+    if (!img) return; // skip videos
+
     let longPressTimer = null;
     let isLongPress = false;
+    let touchMoved = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
 
     wrapper.addEventListener("touchstart", e => {
         isLongPress = false;
+        touchMoved = false;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+
         longPressTimer = setTimeout(() => {
+            if (touchMoved) return;
             isLongPress = true;
             wrapper.classList.toggle("selected");
             const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
             downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
-        }, 500); // 500ms long press
+        }, 500);
+    });
+
+    wrapper.addEventListener("touchmove", e => {
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        if (dx > 10 || dy > 10) {
+            touchMoved = true;
+            clearTimeout(longPressTimer);
+        }
     });
 
     wrapper.addEventListener("touchend", e => {
         clearTimeout(longPressTimer);
-        if (isLongPress) return; // already handled
+        if (isLongPress || touchMoved) return;
 
-        // Single tap → open lightbox
         refreshImages();
         currentIndex = images.indexOf(img.dataset.full);
         showModalImage();
@@ -242,14 +260,8 @@ document.addEventListener("DOMContentLoaded", () => {
         downloadMultipleBtn.style.display = "none";
     });
 
-    wrapper.addEventListener("touchmove", () => {
-        // Cancel long press if finger moves (scrolling)
-        clearTimeout(longPressTimer);
-    });
-
-    // Desktop: single click opens, no selection needed
+    // Desktop fallback
     wrapper.addEventListener("click", e => {
-        if (isLongPress) return;
         if (e.pointerType === "touch") return; // already handled by touch events
         refreshImages();
         currentIndex = images.indexOf(img.dataset.full);
