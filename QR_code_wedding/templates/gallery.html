@@ -27,22 +27,24 @@
 <!-- GALLERY -->
 <div class="gallery" id="gallery">
     {% for item in gallery_pics %}
-    <div class="gallery-item {% if item.type == 'video' %}video{% else %}image{% endif %}">
+<div class="gallery-item {% if item.type == 'video' %}video{% else %}image{% endif %}">
 
-        {% if item.type == "video" %}
-            <video controls preload="metadata">
-                <source src="{{ item.url }}" type="video/mp4">
-            </video>
-        {% else %}
-            <img class="lazy"
-                 data-src="{{ item.url }}"
-                 data-full="{{ item.url }}"
-                 alt="Wedding photo">
-        {% endif %}
+    {% if item.type == "video" %}
+        <video controls preload="metadata">
+            <source src="{{ item.url }}" type="video/mp4">
+        </video>
+    {% else %}
+        <img class="lazy"
+             data-src="{{ item.url }}"
+             data-full="{{ item.url }}"
+             alt="Wedding photo">
+        <button class="select-btn">
+            <i class="fas fa-check"></i>
+        </button>
+    {% endif %}
 
-        <input type="checkbox" class="select-img">
-    </div>
-    {% endfor %}
+</div>
+{% endfor %}
 </div>
 
 <!-- LOADING -->
@@ -225,7 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let touchStartY = 0;
 
         wrapper.addEventListener("touchstart", e => {
-            e.preventDefault();
             isLongPress = false;
             touchMoved = false;
             touchStartX = e.touches[0].clientX;

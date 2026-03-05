@@ -133,3 +133,28 @@ body.gallery_body {
     padding: 20px;
     font-size: 16px;
 }
+
+.select-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: rgba(0,0,0,0.3);
+    color: white;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0.6;
+}
+
+.gallery-item.selected .select-btn {
+    background: #ff4081;
+    border-color: #ff4081;
+    opacity: 1;
+}
