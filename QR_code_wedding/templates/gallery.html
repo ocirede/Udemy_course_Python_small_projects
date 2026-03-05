@@ -214,30 +214,50 @@ document.addEventListener("DOMContentLoaded", () => {
     // ======================
     // GALLERY CLICK & SELECTION
     // ======================
-    function bindGalleryItem(wrapper) {
-        const img = wrapper.querySelector("img");
+   function bindGalleryItem(wrapper) {
+    const img = wrapper.querySelector("img");
+    let longPressTimer = null;
+    let isLongPress = false;
 
-        wrapper.addEventListener("click", () => {
-            const now = Date.now();
-            const tapGap = now - lastTap;
-            lastTap = now;
-
-            if (tapGap < 300) {
-                wrapper.classList.remove("selected");
-                refreshImages();
-                currentIndex = images.indexOf(img.dataset.full);
-                showModalImage();
-                lightbox.classList.remove("hidden");
-                document.body.style.overflow = "hidden";
-                downloadMultipleBtn.style.display = "none";
-                return;
-            }
-
+    wrapper.addEventListener("touchstart", e => {
+        isLongPress = false;
+        longPressTimer = setTimeout(() => {
+            isLongPress = true;
             wrapper.classList.toggle("selected");
             const selectedCount = document.querySelectorAll(".gallery-item.selected").length;
             downloadMultipleBtn.style.display = selectedCount > 0 ? "flex" : "none";
-        });
-    }
+        }, 500); // 500ms long press
+    });
+
+    wrapper.addEventListener("touchend", e => {
+        clearTimeout(longPressTimer);
+        if (isLongPress) return; // already handled
+
+        // Single tap → open lightbox
+        refreshImages();
+        currentIndex = images.indexOf(img.dataset.full);
+        showModalImage();
+        lightbox.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+        downloadMultipleBtn.style.display = "none";
+    });
+
+    wrapper.addEventListener("touchmove", () => {
+        // Cancel long press if finger moves (scrolling)
+        clearTimeout(longPressTimer);
+    });
+
+    // Desktop: single click opens, no selection needed
+    wrapper.addEventListener("click", e => {
+        if (isLongPress) return;
+        if (e.pointerType === "touch") return; // already handled by touch events
+        refreshImages();
+        currentIndex = images.indexOf(img.dataset.full);
+        showModalImage();
+        lightbox.classList.remove("hidden");
+        document.body.style.overflow = "hidden";
+    });
+}
 
     document.querySelectorAll(".gallery-item").forEach(bindGalleryItem);
 
