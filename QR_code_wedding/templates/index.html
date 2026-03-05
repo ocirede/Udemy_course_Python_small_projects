@@ -191,7 +191,7 @@ form.addEventListener("submit", async function(e) {
                     file.name.match(/\.(mp4|mov|m4v)$/i)
                 ) {
                     if (file.size > 100 * 1024 * 1024) {
-                        errDiv.textContent = `❌ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`;
+                        errDiv.textContent = `⚠️ "${file.name}" è troppo grande (${(file.size / 1024 / 1024).toFixed(0)}MB). Il limite è 100MB. Per favore taglia o comprimi il video prima di caricarlo.`;
                         errDiv.style.display = "block";
                         setTimeout(() => {
                             errDiv.style.display = "none";
