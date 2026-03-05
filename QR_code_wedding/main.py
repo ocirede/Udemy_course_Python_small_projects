@@ -144,9 +144,10 @@ def gallery():
         type="upload",
         prefix="wedding-photos",
         max_results=10,
+        sort_by=[{"created_at": "desc"}],
+        direction="desc",
         next_cursor=cursor
     )
-
     for res in img_result.get("resources", []):
         items.append({
             "url": res["secure_url"],
