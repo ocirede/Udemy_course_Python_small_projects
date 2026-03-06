@@ -254,19 +254,25 @@ function bindGalleryItem(wrapper) {
     wrapper.addEventListener("touchmove", e => {
         const dx = Math.abs(e.touches[0].clientX - touchStartX);
         const dy = Math.abs(e.touches[0].clientY - touchStartY);
-        if (dx > 10 || dy > 10) touchMoved = true;
+        if (dx > 15 || dy > 15) touchMoved = true;
     });
 
     wrapper.addEventListener("touchend", e => {
         if (touchMoved) return;
-        if (e.target.closest(".select-btn")) return; // ignore select button taps
+        if (e.target.closest(".select-btn")) return;
+
+        e.preventDefault(); // prevents the ghost click after touch
+
+        const targetSrc = img.dataset.full;
         refreshImages();
-        currentIndex = images.indexOf(img.dataset.full);
+        currentIndex = images.indexOf(targetSrc);
+        if (currentIndex === -1) return;
+
         showModalImage();
         lightbox.classList.remove("hidden");
         document.body.style.overflow = "hidden";
         downloadMultipleBtn.style.display = "none";
-    });
+});
 
     // Desktop fallback
     wrapper.addEventListener("click", e => {
