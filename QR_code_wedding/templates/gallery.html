@@ -261,7 +261,7 @@ function bindGalleryItem(wrapper) {
         if (touchMoved) return;
         if (e.target.closest(".select-btn")) return;
 
-        e.preventDefault(); // prevents the ghost click after touch
+        e.preventDefault(); 
 
         const targetSrc = img.dataset.full;
         refreshImages();
