@@ -59,8 +59,9 @@ def index():
 
     return render_template("index.html", photos=urls, language=language)
 
-@app.route("/upload", methods=['POST'])
+@app.route("/upload", methods=["POST"])
 def upload():
+
     files = request.files.getlist("file")
 
     if not files:
@@ -69,29 +70,44 @@ def upload():
     if len(files) > MAX_FILES:
         return jsonify({'error': f'Too many files. Maximum is {MAX_FILES}.'}), 400
 
+    uploaded_any = False
+
     for file in files:
-        if file.filename == "":
+
+        # iPhone sometimes sends empty files
+        if not file or file.filename == "":
             continue
 
         try:
+
+            uploaded_any = True
+
             mimetype = file.mimetype or ""
             ext = os.path.splitext(file.filename.lower())[1]
 
             # Validate file type
-            if mimetype not in ALLOWED_IMAGE_TYPES and mimetype not in ALLOWED_VIDEO_TYPES \
-               and ext not in ALLOWED_EXTENSIONS:
+            if (
+                mimetype not in ALLOWED_IMAGE_TYPES
+                and mimetype not in ALLOWED_VIDEO_TYPES
+                and ext not in ALLOWED_EXTENSIONS
+            ):
                 return jsonify({'error': f'Unsupported file type: {file.filename}'}), 400
 
-            # Get file size
-            file.seek(0, 2)
-            size = file.tell()
-            file.seek(0)
+            # Get file size safely
+            file.stream.seek(0, 2)
+            size = file.stream.tell()
+            file.stream.seek(0)
 
             # VIDEO
             if mimetype.startswith("video") or ext in {'.mp4', '.mov', '.m4v'}:
+
                 if size > MAX_VIDEO:
-                    return jsonify({'error': f'{file.filename} is too large. Maximum is 100MB.'}), 400
+                    return jsonify({
+                        'error': f'{file.filename} is too large. Maximum is 100MB.'
+                    }), 400
+
                 print(f"Uploading video: {file.filename}, size={size}")
+
                 cloudinary.uploader.upload_large(
                     file.stream,
                     resource_type="video",
@@ -101,13 +117,23 @@ def upload():
                     secure=True
                 )
 
-            # HEIC/HEIF — convert to JPEG first
+            # HEIC / HEIF
             elif ext in {'.heic', '.heif'} or mimetype in {'image/heic', 'image/heif'}:
+
                 print(f"Converting HEIC image: {file.filename}")
+
                 img = Image.open(file.stream)
+
                 output = io.BytesIO()
-                img.convert("RGB").save(output, format="JPEG", quality=85)
+
+                img.convert("RGB").save(
+                    output,
+                    format="JPEG",
+                    quality=85
+                )
+
                 output.seek(0)
+
                 cloudinary.uploader.upload(
                     output,
                     resource_type="image",
@@ -115,9 +141,11 @@ def upload():
                     secure=True
                 )
 
-            # IMAGE
+            # NORMAL IMAGE
             else:
+
                 print(f"Uploading image: {file.filename}, size={size}")
+
                 cloudinary.uploader.upload(
                     file.stream,
                     resource_type="image",
@@ -126,11 +154,16 @@ def upload():
                 )
 
         except Exception as e:
+
             print(f"Upload error for {file.filename}: {e}")
+
             return jsonify({'error': str(e)}), 500
 
-    return jsonify({'success': True}), 200
+    # if all files were empty (iPhone bug)
+    if not uploaded_any:
+        return jsonify({'error': 'No valid files selected'}), 400
 
+    return jsonify({'success': True}), 200
 @app.route("/gallery", methods=["GET"])
 def gallery():
     language = session.get("language")
